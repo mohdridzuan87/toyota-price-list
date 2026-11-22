@@ -39,6 +39,7 @@
         <p class="address" id="c-address"></p>
         <p class="setup-hint no-print" id="setup-hint">Tap <b>Edit card</b> to add your own name, phone, company and photo. It is saved on your phone only, and it goes onto the PDF you share.</p>
       </div>
+      <div class="card-logos" id="card-logos" hidden></div>
       <button class="btn no-print" id="edit-btn" type="button" aria-expanded="false" aria-controls="edit-panel">Edit card</button>
     </section>
 
@@ -63,6 +64,35 @@
           <small>Formats automatically, e.g. +6016 - 331 3607</small></label>
         <label>Company name <input id="f-company" type="text" maxlength="80" placeholder="TOYOTA PCM | Telok Panglima Garang"></label>
         <label class="wide">Company address <textarea id="f-address" rows="3" maxlength="200" placeholder="Company address"></textarea></label>
+        <div class="logos-edit wide">
+          <p class="sub">More images on the card <small>(company logo and others, shown beside your details and on the PDF)</small></p>
+          <div class="logo-tiles">
+          <div class="logo-tile" id="logo-tile-1">
+            <div class="logo-prev"><img alt="" hidden><span>Company logo</span></div>
+            <div class="tile-actions">
+              <label class="btn small" for="logo-input-1">Choose</label>
+              <input id="logo-input-1" type="file" accept="image/*" hidden>
+              <button class="btn small ghost" type="button" data-remove="1">Remove</button>
+            </div>
+          </div>
+          <div class="logo-tile" id="logo-tile-2">
+            <div class="logo-prev"><img alt="" hidden><span>Image 2</span></div>
+            <div class="tile-actions">
+              <label class="btn small" for="logo-input-2">Choose</label>
+              <input id="logo-input-2" type="file" accept="image/*" hidden>
+              <button class="btn small ghost" type="button" data-remove="2">Remove</button>
+            </div>
+          </div>
+          <div class="logo-tile" id="logo-tile-3">
+            <div class="logo-prev"><img alt="" hidden><span>Image 3</span></div>
+            <div class="tile-actions">
+              <label class="btn small" for="logo-input-3">Choose</label>
+              <input id="logo-input-3" type="file" accept="image/*" hidden>
+              <button class="btn small ghost" type="button" data-remove="3">Remove</button>
+            </div>
+          </div>
+          </div>
+        </div>
         <div class="panel-actions wide">
           <button class="btn" id="edit-done" type="button">Done</button>
           <button class="btn ghost" id="edit-reset" type="button">Reset to default</button>

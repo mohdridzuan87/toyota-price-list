@@ -89,6 +89,18 @@ export async function buildPdf({ data, card, period, updated }) {
   ]);
   const carDims = await Promise.all(cars.map((c) => (c ? loadImg(c).then((i) => ({ w: i.width, h: i.height })) : null)));
 
+  // extra images (company logo etc.): drawn at the right end of the name card, 11 mm tall, up to 30 mm wide each
+  const logos = (await Promise.all(['logo1', 'logo2', 'logo3'].map(async (key) => {
+    if (!card[key] || !card[key].startsWith('data:image/')) return null;
+    try {
+      const im = await loadImg(card[key]);
+      const h = 11;
+      const w = Math.min(30, h * (im.width / im.height));
+      return { src: card[key], w, h: w / (im.width / im.height) };
+    } catch { return null; }
+  }))).filter(Boolean);
+  const logosW = logos.reduce((a, l) => a + l.w, 0) + Math.max(0, logos.length - 1) * 4;
+
   // ---------- header
   let y = M;
   doc.addImage(logo, 'PNG', M, y, 14 * (268 / 172), 14);
@@ -102,7 +114,7 @@ export async function buildPdf({ data, card, period, updated }) {
   y += 2.4;
 
   // ---------- name card (skipped when nothing is filled in)
-  const hasCard = card.name || card.phone || card.company || card.address;
+  const hasCard = card.name || card.phone || card.company || card.address || logos.length;
   if (hasCard) {
     const h = 15;
     doc.setDrawColor(...INK);
@@ -119,9 +131,14 @@ export async function buildPdf({ data, card, period, updated }) {
     const x2 = M + 108;
     if (card.company) T(card.company.toUpperCase(), x2, y + 4.6, { size: 9, bold: true });
     if (card.address) {
-      const lines = wrap(card.address, PW - M - x2 - 3, 7).slice(0, 3);
+      const lines = wrap(card.address, PW - M - x2 - 4 - (logosW ? logosW + 4 : 0), 7).slice(0, 3);
       lines.forEach((ln, i) => T(ln, x2, y + 8.2 + i * 2.9, { size: 7, color: MUTED }));
     }
+    let lx = PW - M - 3 - logosW;
+    logos.forEach((l) => {
+      doc.addImage(l.src, fmtOf(l.src), lx, y + (h - l.h) / 2, l.w, l.h);
+      lx += l.w + 4;
+    });
     y += h + 2.4;
   }
   const modelsTop = y;

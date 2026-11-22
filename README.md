@@ -44,3 +44,5 @@ npm test            # compare against the November 2026 Excel (only valid for th
 ```
 
 Prices are estimates for reference. Always confirm with the official Toyota price list.
+
+Extra images: besides the circular profile photo, the card has three more image slots (company logo plus two others). They show beside the details on the page and are drawn on the PDF (up to 11 mm tall). They are stored on the phone with the rest of the card and included in the backup file.

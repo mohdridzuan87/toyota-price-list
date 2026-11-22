@@ -115,6 +115,7 @@ function renderNotes(data) {
 /* ------------------------------------------------------------------ name card */
 
 const KEY = 'toyota-price-list.card.v1';
+const LOGO_KEYS = ['logo1', 'logo2', 'logo3']; // company logo + two more images shown beside the details
 const PH = { name: 'Wan Jasni', phone: '+6016 - 331 3607', company: 'TOYOTA PCM | Telok Panglima Garang' }; // greyed examples until the advisor fills in their own
 // Card data lives on the user's own phone/computer only: localStorage + IndexedDB (two copies),
 // asked to be "persistent" so the browser does not clear it, plus a backup file the user can keep.
@@ -176,9 +177,49 @@ function setPhoto(imgEl, initEl, photo, name) {
   else { imgEl.removeAttribute('src'); imgEl.hidden = true; initEl.hidden = false; initEl.textContent = initials(name); }
 }
 
+function renderLogos() {
+  const box = $('card-logos');
+  box.replaceChildren();
+  LOGO_KEYS.forEach((k, n) => {
+    const tile = document.querySelector('#logo-tile-' + (n + 1));
+    const prev = tile.querySelector('img');
+    if (card[k]) {
+      const img = new Image();
+      img.src = card[k];
+      img.alt = '';
+      box.appendChild(img);
+      prev.src = card[k];
+      prev.hidden = false;
+      tile.querySelector('span').hidden = true;
+    } else {
+      prev.removeAttribute('src');
+      prev.hidden = true;
+      tile.querySelector('span').hidden = false;
+    }
+  });
+  box.hidden = !box.children.length;
+}
+
+/** Downscale an uploaded logo/image (max 360 px) keeping transparency for PNG/WebP/SVG. */
+async function readLogo(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await loadImage(url);
+    const k = Math.min(1, 360 / Math.max(img.width || 360, img.height || 360));
+    const cv = document.createElement('canvas');
+    cv.width = Math.max(1, Math.round((img.width || 360) * k));
+    cv.height = Math.max(1, Math.round((img.height || 360) * k));
+    const ctx = cv.getContext('2d');
+    const keepAlpha = /png|webp|svg/.test(file.type);
+    if (!keepAlpha) { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height); }
+    ctx.drawImage(img, 0, 0, cv.width, cv.height);
+    return keepAlpha ? cv.toDataURL('image/png') : cv.toDataURL('image/jpeg', 0.88);
+  } finally { URL.revokeObjectURL(url); }
+}
+
 function renderCard() {
   $('c-name').textContent = card.name || PH.name;
-  $('namecard').classList.toggle('empty', !card.name && !card.phone && !card.company && !card.address);
+  $('namecard').classList.toggle('empty', !card.name && !card.phone && !card.company && !card.address && !LOGO_KEYS.some((k) => card[k]));
   $('c-title').textContent = card.title;
   const ph = $('c-phone');
   ph.textContent = card.phone || PH.phone;
@@ -189,6 +230,7 @@ function renderCard() {
   $('c-address').textContent = card.address;
   setPhoto($('avatar-img'), $('avatar-initials'), card.photo, card.name);
   setPhoto($('preview-img'), $('preview-initials'), card.photo, card.name);
+  renderLogos();
 }
 
 let saveTimer;
@@ -333,6 +375,16 @@ async function initCard() {
       drawCrop();
     });
   }
+  LOGO_KEYS.forEach((k, n) => {
+    $('logo-input-' + (n + 1)).addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      e.target.value = '';
+      if (!file) return;
+      try { card[k] = await readLogo(file); renderCard(); persist(); }
+      catch { $('saved').textContent = 'That file could not be read as an image.'; }
+    });
+    document.querySelector('[data-remove="' + (n + 1) + '"]').addEventListener('click', () => { delete card[k]; renderCard(); persist(); });
+  });
   $('backup-btn').addEventListener('click', () => {
     const blob = new Blob([JSON.stringify({ app: 'toyota-price-list-card', version: 1, card }, null, 2)], { type: 'application/json' });
     const link = document.createElement('a');
@@ -354,6 +406,7 @@ async function initCard() {
       const clean = {};
       for (const k of ['name', 'title', 'phone', 'company', 'address']) if (typeof c[k] === 'string') clean[k] = c[k].slice(0, 200);
       for (const k of ['photo', 'photoSrc']) if (typeof c[k] === 'string' && c[k].startsWith('data:image/') && c[k].includes(';base64,')) clean[k] = c[k];
+      for (const k of LOGO_KEYS) if (typeof c[k] === 'string' && c[k].startsWith('data:image/') && c[k].includes(';base64,')) clean[k] = c[k];
       if (c.adj && [c.adj.z, c.adj.x, c.adj.y].every((n) => Number.isFinite(n))) clean.adj = { z: c.adj.z, x: c.adj.x, y: c.adj.y };
       if (!Object.keys(clean).length) throw new Error('empty');
       if (clean.phone) clean.phone = formatMyPhone(clean.phone);
