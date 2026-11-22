@@ -14,7 +14,8 @@ const eq = (label, got, want) => {
   if (!ok) { fail++; console.log('FAIL', label, 'got', got, 'want', want); }
 };
 
-// Original Excel (Toyota Price List.xlsx, Nov 2026): name -> [body, rebate, insurance, DP, loan, 9y/90%, 9y/100%]
+// Original Excel (Toyota Price List.xlsx, Nov 2026): body price, rebate and insurance are compared with it.
+// (The old Excel D/P base, 10% of body + insurance, was replaced by 10% of body only.)
 const X = {
   'YARIS 1.E': [90400, 'n/a', 3100, 9350, 81050, 906, 1010],
   'YARIS 1.G': [96400, 'n/a', 3300, 9970, 86430, 966, 1077],
@@ -62,10 +63,12 @@ for (const g of data.groups) {
     if (x[1] === 'n/a') eq(v.name + ' rebate', v.rebate.text, 'n/a');
     else if (x[1] != null) eq(v.name + ' rebate', v.rebate.amount, x[1]);
     eq(v.name + ' insurance', v.insurance, x[2]);
-    eq(v.name + ' DP', c.dp, x[3]);
-    eq(v.name + ' loan', c.loan, x[4]);
-    eq(v.name + ' 9y/90%', c.m90, x[5]);
-    eq(v.name + ' 9y/100%', c.m100, x[6]);
+    // D/P is on the body price only (changed from the Excel method on purpose)
+    const dpE = v.body * 0.1, loanE = v.body - dpE, f = 1 + 0.023 * 9;
+    eq(v.name + ' DP', c.dp, dpE);
+    eq(v.name + ' loan', c.loan, loanE);
+    eq(v.name + ' 9y/10% D/P', c.m90, (loanE * f) / 108);
+    eq(v.name + ' 9y/0% D/P', c.m100, (v.body * f) / 108);
   }
 }
 for (const n of Object.keys(X)) if (!seen.has(n)) { fail++; console.log('FAIL missing variant', n); }

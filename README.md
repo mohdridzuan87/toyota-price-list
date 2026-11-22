@@ -11,10 +11,10 @@ A GitHub Actions workflow (`.github/workflows/update.yml`) runs at these Malaysi
 | Body price | "On The Road Price without Insurance" (Individual, Peninsular Malaysia) in each model's price-list PDF linked from toyota.com.my/en/price-and-model-tools/price-list.html |
 | Rebate | Monthly promo page, toyota.com.my/en/promotions/monthly-promo.html (the promo cards embedded in the page) |
 | Est. insurance | Toyota publishes no premiums. Estimate = the PDF's *Recommended Sum Insured* x a per-variant rate calibrated from the original Excel estimates (`est / baseSI` in `config/products.json`), rounded to the nearest RM100 |
-| D/P 10% | 10% x (body price + est. insurance), calculated in the browser (`site/calc.js`) |
+| D/P 10% | 10% x body price (insurance is paid separately), calculated in the browser (`site/calc.js`) |
 | Loan | body price − D/P |
 | 9 years / 90% | (loan x 2.3% x 9 + loan) / 108, flat rate |
-| 9 years / 100% | (body price x 2.3% x 9 + body price) / 108, no D/P |
+| 9 years / 0% D/P | (body price x 2.3% x 9 + body price) / 108, whole body price financed |
 
 The header month and year (`NOVEMBER 2026`) come from the time the data was generated. The page shows a warning if the data is older than 20 days.
 
