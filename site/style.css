@@ -320,3 +320,7 @@ tbody th, tbody td { padding-left: 8px; padding-right: 8px; }
   tbody td.g1:nth-child(10) { grid-column: auto; }
   tbody td.g1:nth-child(9) { grid-column: 1 / -1; }
 }
+
+/* ---------- "monthly excludes insurance" note */
+.chip.warn { background: #fff4d6; border-color: #f0cf73; color: #5a3d00; font-weight: 700; }
+@media print { .chip.warn { font-size: 8.5px; padding: 1px 8px; } }

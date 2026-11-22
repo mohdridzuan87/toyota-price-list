@@ -108,6 +108,12 @@ export async function buildPdf({ data, card, period, updated }) {
   T('PRICE LIST', tx, y + 2, { size: 6.5, bold: true, color: MUTED, charSpace: 0.8 });
   T(period, tx, y + 8.4, { size: 24, bold: true });
   T(updated, tx, y + 13.4, { size: 6.5, color: MUTED });
+  // note for the customer: monthly figures exclude insurance
+  doc.setFillColor(255, 244, 214);
+  doc.setDrawColor(240, 207, 115);
+  doc.setLineWidth(0.3);
+  doc.roundedRect(PW - M - 112, y + 3, 112, 9, 1.8, 1.8, 'FD');
+  T('Monthly instalment does not include insurance. Insurance is paid separately.', PW - M - 56, y + 7.5, { size: 7.4, bold: true, color: [90, 61, 0], align: 'center' });
   y += 16.3;
   doc.setFillColor(...RED);
   doc.rect(M, y, PW - 2 * M, 0.9, 'F');

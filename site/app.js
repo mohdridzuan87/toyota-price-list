@@ -58,7 +58,7 @@ function renderAssumptions(s) {
     `${s.years}-year tenure`,
     'OTR prices, Peninsular Malaysia',
   ];
-  $('assump').innerHTML = chips.map((c) => `<span class="chip">${esc(c)}</span>`).join('');
+  $('assump').innerHTML = chips.map((c) => `<span class="chip">${esc(c)}</span>`).join('') + `<span class="chip warn">Monthly instalment does not include insurance. Insurance is paid separately.</span>`;
 }
 
 function renderModels(data) {
