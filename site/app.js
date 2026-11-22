@@ -1,7 +1,7 @@
 import { calc, rm } from './calc.js';
 import { formatMyPhone, telHref } from './phone.js';
 import { notes as footNotes } from './notes.js';
-import { buildPdf } from './pdf.js';
+import { buildPdf, buildImage } from './pdf.js';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -371,6 +371,10 @@ $('print-btn').addEventListener('click', () => window.print());
 
 /** Share the generated PDF itself (not a text message). Phones: share sheet -> WhatsApp. Desktop: download + open WhatsApp. */
 let lastData = null;
+async function makeImage() {
+  if (!lastData) throw new Error('price list not loaded yet');
+  return buildImage({ data: lastData, card, period: $('period').textContent.trim(), updated: $('updated').textContent.trim() });
+}
 async function makePdf() {
   if (!lastData) throw new Error('price list not loaded yet');
   return buildPdf({ data: lastData, card, period: $('period').textContent.trim(), updated: $('updated').textContent.trim() });
@@ -423,6 +427,24 @@ $('dl-btn').addEventListener('click', async () => {
   try { saveBlob(await makePdf(), pdfName()); }
   catch (err) { shareStatus('Could not create the PDF (' + (err && err.message ? err.message : 'error') + ').'); }
   finally { btn.disabled = false; }
+});
+
+$('img-btn').addEventListener('click', async () => {
+  const btn = $('img-btn');
+  btn.disabled = true;
+  const label = btn.textContent;
+  btn.textContent = 'Preparing image…';
+  try {
+    const blob = await makeImage();
+    const ext = blob.type === 'image/jpeg' ? 'jpg' : 'png';
+    saveBlob(blob, pdfName().replace(/.pdf$/, '') + '-WhatsApp-Catalogue.' + ext);
+    shareStatus('Saved a high-resolution ' + ext.toUpperCase() + ' (4200 x 2970 px, ' + (blob.size / 1048576).toFixed(1) + ' MB). Add it as a photo in your WhatsApp Catalogue.');
+  } catch (err) {
+    shareStatus('Could not create the image (' + (err && err.message ? err.message : 'error') + ').');
+  } finally {
+    btn.textContent = label;
+    btn.disabled = false;
+  }
 });
 
 (async function start() {

@@ -2,6 +2,7 @@
 // so every sales advisor gets their OWN name card on it. Uses the vendored jsPDF (MIT).
 import { calc, rm } from './calc.js';
 import { notes, DOCS } from './notes.js';
+import { createCanvasDoc } from './canvasdoc.js';
 
 let libPromise;
 function loadJsPdf() {
@@ -58,11 +59,28 @@ const HEAD = [245, 246, 247];
 
 /**
  * @param {{data:object, card:object, period:string, updated:string}} o
- * @returns {Promise<Blob>}
+ * @returns {Promise<Blob>} a one-page A4 landscape vector PDF
  */
-export async function buildPdf({ data, card, period, updated }) {
+export async function buildPdf(o) {
   const { jsPDF } = await loadJsPdf();
   const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+  await drawSheet(doc, o);
+  doc.setProperties({ title: 'Toyota Price List ' + o.period, author: o.card.name || '', subject: 'Toyota Malaysia price list' });
+  return doc.output('blob');
+}
+
+/**
+ * The same sheet as one high-resolution picture (4200 x 2970 px) for the WhatsApp Catalogue, so it stays
+ * sharp when the customer zooms in. PNG, or JPEG 95% if the PNG would exceed ~4.8 MB.
+ * @returns {Promise<Blob>}
+ */
+export async function buildImage(o, { widthPx = 4200 } = {}) {
+  const doc = createCanvasDoc(297, 210, widthPx / 297);
+  await drawSheet(doc, o);
+  return doc.toBlob();
+}
+
+async function drawSheet(doc, { data, card, period, updated }) {
   const PW = 297;
   const PH = 210;
   const M = 6;
@@ -100,6 +118,8 @@ export async function buildPdf({ data, card, period, updated }) {
     } catch { return null; }
   }))).filter(Boolean);
   const logosW = logos.reduce((a, l) => a + l.w, 0) + Math.max(0, logos.length - 1) * 4;
+
+  await doc.preload?.([logo, avatar, ...cars, ...logos.map((l) => l.src)]); // only the canvas drawer needs this
 
   // ---------- header
   let y = M;
@@ -282,7 +302,4 @@ export async function buildPdf({ data, card, period, updated }) {
   docsLines.forEach((ln) => { T(ln, M, fy + 1.2, { size: 5.8, bold: true }); fy += 2.5; });
   fy += 1.6;
   noteLines.forEach((ln) => { T(ln, M + 1, fy + 0.9, { size: 5, color: MUTED }); fy += 2.05; });
-
-  doc.setProperties({ title: 'Toyota Price List ' + period, author: card.name || '', subject: 'Toyota Malaysia price list' });
-  return doc.output('blob');
 }
