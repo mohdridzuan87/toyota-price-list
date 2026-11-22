@@ -190,11 +190,11 @@ sup { color: var(--red-ink); font-weight: 800; }
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   body { font-size: 7px; line-height: 1.25; }
   .no-print { display: none !important; }
-  .page { max-width: none; padding: 0; zoom: 0.98; }
+  .page { max-width: none; padding: 0; zoom: 0.92; }
   .masthead { padding: 0 0 3px; gap: 12px; border-bottom-width: 2px; }
   .logo { height: 30px; }
   .eyebrow { font-size: 6px; }
-  h1 { font-size: 17px; margin: 0; }
+  h1 { font-size: 30px; margin: 0; }
   .updated { font-size: 6.5px; }
   .namecard { margin: 4px 0 0; padding: 4px 10px; gap: 10px; border-width: 1px; border-radius: 6px; }
   .avatar { width: 38px; height: 38px; font-size: 13px; box-shadow: 0 0 0 1.5px #fff, 0 0 0 2.5px var(--red); }
@@ -214,8 +214,8 @@ sup { color: var(--red-ink); font-weight: 800; }
   .model-head img { height: 14px; max-width: 40px; padding: 1px 3px; border-radius: 3px; }
   .model-head h2 { font-size: 8.5px; letter-spacing: .05em; }
   .eff { font-size: 5.5px; }
-  thead th { padding: 1.5px 3px; font-size: 6.2px; letter-spacing: 0; }
-  thead th small { font-size: 6px; }
+  thead th { padding: 1.5px 3px; font-size: 7.6px; letter-spacing: 0; }
+  thead th small { font-size: 7.6px; }
   tbody th, tbody td { padding: 1.2px 3px; font-size: 6.3px; }
   tbody th { font-size: 6.3px; }
   td.em { font-size: 7px; }
