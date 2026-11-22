@@ -28,7 +28,7 @@ function nextUpdate(from) {
 
 function renderHeader(data) {
   const gen = new Date(data.generatedAt);
-  const period = $('period').textContent.trim().split(' ').join('-');
+  const period = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric', timeZone: TZ }).format(gen).toUpperCase();
   $('period').textContent = period;
   $('updated').textContent = `Updated ${fmtDate(gen)} · next auto-update ${fmtDate(nextUpdate(gen))}`;
   document.title = `Toyota Price List – ${period.charAt(0) + period.slice(1).toLowerCase()}`;
