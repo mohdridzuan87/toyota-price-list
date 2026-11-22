@@ -101,6 +101,8 @@ h1 { margin: 2px 0 2px; font-size: clamp(26px, 5.2vw, 42px); line-height: 1.05; 
 .loading { color: var(--muted); padding: 30px 0; text-align: center; }
 .loading.error { color: var(--red-ink); font-weight: 700; }
 .model { margin: 18px 0 0; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: #fff; break-inside: avoid; }
+.model:nth-of-type(even) { background: #f4f5f6; }
+.model:nth-of-type(even) thead th { background: #eceef0; }
 .model-head { display: flex; align-items: center; gap: 16px; padding: 10px 16px; background: var(--ink); color: #fff; }
 .model-head img { height: 52px; width: auto; max-width: 130px; object-fit: contain; background: #fff; border-radius: 8px; padding: 2px 6px; }
 .model-head h2 { margin: 0; font-size: 20px; letter-spacing: .06em; font-weight: 800; }
@@ -117,7 +119,7 @@ thead th.em { color: var(--red-ink); }
 tbody th, tbody td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
 tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 tbody th { text-align: left; font-weight: 700; white-space: normal; }
-tbody tr:hover { background: #fafafa; }
+tbody tr:hover { background: rgba(0,0,0,.025); }
 td small { color: var(--muted); font-weight: 500; font-size: 11px; }
 td.em { font-weight: 800; font-size: 16px; color: var(--red-ink); }
 td.em.alt { color: var(--ink); font-weight: 700; }
