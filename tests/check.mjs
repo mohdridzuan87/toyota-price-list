@@ -4,7 +4,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { calc } from '../site/calc.js';
-import { formatMyPhone } from '../site/phone.js';
+import { formatMyPhone, formatMyPhoneLocal } from '../site/phone.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const data = JSON.parse(await fs.readFile(path.join(ROOT, 'site/data/prices.json'), 'utf8'));
@@ -87,6 +87,16 @@ const P = [
   ['', ''],
 ];
 for (const [i, o] of P) eq('phone "' + i + '"', formatMyPhone(i), o);
+const L = [
+  ['+6016 - 331 3607', '016-331 3607'],
+  ['0163313607', '016-331 3607'],
+  ['6016-3313607', '016-331 3607'],
+  ['011-23456789', '011-2345 6789'],
+  ['0312228028', '03-1222 8028'],
+  ['0', ''],
+  ['', ''],
+];
+for (const [i, o] of L) eq('local phone "' + i + '"', formatMyPhoneLocal(i), o);
 
 console.log(fail ? `\n${fail} check(s) FAILED` : `All checks passed (${seen.size} variants vs Excel, phone formats)`);
 process.exit(fail ? 1 : 0);

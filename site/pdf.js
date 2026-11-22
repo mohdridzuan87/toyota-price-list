@@ -3,6 +3,7 @@
 import { calc, rm } from './calc.js';
 import { notes, DOCS } from './notes.js';
 import { createCanvasDoc } from './canvasdoc.js';
+import { formatMyPhoneLocal } from './phone.js';
 
 let libPromise;
 function loadJsPdf() {
@@ -153,7 +154,7 @@ async function drawSheet(doc, { data, card, period, updated }) {
     const x1 = M + 19;
     T((card.name || '').toUpperCase(), x1, y + 4.2, { size: 12, bold: true });
     if (card.title) T(card.title, x1, y + 8, { size: 7, bold: true });
-    if (card.phone) T(card.phone, x1, y + 12, { size: 13, bold: true });
+    if (card.phone) T(formatMyPhoneLocal(card.phone), x1, y + 12, { size: 13, bold: true }); // 016-331 3607 on the PDF / image
     const x2 = M + 108;
     if (card.company) T(card.company.toUpperCase(), x2, y + 4.6, { size: 9, bold: true });
     if (card.address) {
