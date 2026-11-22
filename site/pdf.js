@@ -121,11 +121,11 @@ async function drawSheet(doc, { data, card, period, updated }) {
   }))).filter(Boolean);
   const logosW = logos.reduce((a, l) => a + l.w, 0) + Math.max(0, logos.length - 1) * 4;
 
-  // WhatsApp QR code from the phone number: 30% larger than the profile picture (11 mm -> 14.3 mm)
+  // WhatsApp QR code from the phone number. Profile picture is 11 mm; the QR was 1.3x that (14.3 mm) and is now 30% bigger again (18.6 mm)
   let qr = null;
   const wa = waLink(card.phone);
   if (wa) { try { qr = await qrMatrix(wa); } catch { qr = null; } }
-  const QR = 11 * 1.3;
+  const QR = 11 * 1.3 * 1.3;
   const qrBlockW = qr ? QR + 2 + 14 : 0; // the code + gap + the "SCAN TO WHATSAPP" caption
   const rightW = (logosW ? logosW + 4 : 0) + (qrBlockW ? qrBlockW + 4 : 0);
 
@@ -152,7 +152,7 @@ async function drawSheet(doc, { data, card, period, updated }) {
   // ---------- name card (skipped when nothing is filled in)
   const hasCard = card.name || card.phone || card.company || card.address || logos.length || qr;
   if (hasCard) {
-    const h = qr ? 18 : 15;
+    const h = qr ? 22 : 15;
     const o = (h - 15) / 2; // centre the text block when the card is taller
     doc.setDrawColor(...INK);
     doc.setLineWidth(0.35);
@@ -162,9 +162,9 @@ async function drawSheet(doc, { data, card, period, updated }) {
     doc.setLineWidth(0.5);
     doc.circle(M + 8.5, y + 7.5 + o, 6.1, 'S');
     const x1 = M + 19;
-    T((card.name || '').toUpperCase(), x1, y + 4.2 + o, { size: 12, bold: true });
-    if (card.title) T(card.title, x1, y + 8 + o, { size: 7, bold: true });
-    if (card.phone) T(formatMyPhoneLocal(card.phone), x1, y + 12 + o, { size: 13, bold: true }); // 016-331 3607 on the PDF / image
+    T((card.name || '').toUpperCase(), x1, y + 4.6 + o, { size: 12, bold: true });
+    if (card.title) T(card.title, x1, y + 8.6 + o, { size: 7, bold: true });
+    if (card.phone) T(formatMyPhoneLocal(card.phone), x1, y + 13.4 + o, { size: 13 * 1.2, bold: true }); // phone number +20% (13 pt -> 15.6 pt) // 016-331 3607 on the PDF / image
     const x2 = M + 108;
     if (card.company) T(card.company.toUpperCase(), x2, y + 4.6 + o, { size: 9, bold: true });
     if (card.address) {
