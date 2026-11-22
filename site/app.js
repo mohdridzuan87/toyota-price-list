@@ -126,7 +126,7 @@ function renderNotes(data) {
 
 const KEY = 'toyota-price-list.card.v1';
 const LOGO_KEYS = ['logo1', 'logo2', 'logo3']; // company logo + two more images shown beside the details
-const PH = { name: 'Wan Jasni', phone: '+6016 - 331 3607', company: 'TOYOTA PCM | Telok Panglima Garang' }; // greyed examples until the advisor fills in their own
+const PH = { name: 'Wan Jasni', phone: '016-331 3607', company: 'TOYOTA PCM | Telok Panglima Garang' }; // greyed examples until the advisor fills in their own
 // The card is saved in this browser's own data (localStorage) on the user's phone/computer only.
 const store = {
   get() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { return null; } },
@@ -242,11 +242,7 @@ function bindField(id, key, transform) {
   });
 }
 
-const phoneInput = (v, e) => {
-  const digits = v.replace(/\D/g, '');
-  if (e.inputType && e.inputType.startsWith('delete') && digits.length <= 2) return '';
-  return formatMyPhone(v);
-};
+const phoneInput = (v) => formatMyPhone(v); // 016-331 3607 style; deleting works one character at a time
 
 function loadImage(src) {
   return new Promise((resolve, reject) => {
@@ -302,7 +298,9 @@ async function onPhoto(file) {
 
 async function initCard() {
   const stored = await store.get();
+  defaults.phone = formatMyPhone(defaults.phone); // always the local style, e.g. 016-331 3607
   card = { ...defaults, ...(stored || {}) };
+  card.phone = formatMyPhone(card.phone);
   renderCard();
 
   const panel = $('edit-panel');

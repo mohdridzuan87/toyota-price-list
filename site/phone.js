@@ -1,19 +1,19 @@
-// Malaysian phone number formatter (works while typing).
-//   mobile   0163313607  -> +6016 - 331 3607   (011: +6011 - 2345 6789);  local style: 016-331 3607
-//   landline 0312228028  -> +603 - 1222 8028   (other states: +604 - 123 4567);  local style: 03-1222 8028
-function format(raw, local) {
-  let d = String(raw ?? '').replace(/\D/g, '');
-  if (!d) return '';
+// Malaysian phone number formatter (works while typing). Local style, no +60:
+//   mobile   0163313607  -> 016-331 3607   (011: 011-2345 6789)
+//   landline 0312228028  -> 03-1222 8028   (other states: 04-123 4567)
+// A number pasted with +60 / 60 in front is converted to the local style.
+export function formatMyPhone(raw) {
+  const all = String(raw ?? '').replace(/\D/g, '');
+  if (!all) return '';
+  let d = all;
   if (d.startsWith('60')) d = d.slice(2);
   else if (d.startsWith('0')) d = d.slice(1);
   d = d.slice(0, 10);
-  const prefix = local ? '0' : '+60';
-  if (!d) return local ? '' : '+60';
+  if (!d) return all.startsWith('0') ? '0' : ''; // just the leading 0 typed so far
 
-  // on screen: +6016 - 331 3607   |   on the PDF / image: 016-331 3607
   const join = (area, ...rest) => {
     const parts = rest.filter(Boolean);
-    return prefix + area + (parts.length ? (local ? '-' : ' - ') + parts[0] : '') + (parts[1] ? ' ' + parts[1] : '');
+    return '0' + area + (parts.length ? '-' + parts[0] : '') + (parts[1] ? ' ' + parts[1] : '');
   };
 
   if (d[0] === '1') {
@@ -28,15 +28,8 @@ function format(raw, local) {
   return join(area, rest.slice(0, 3), rest.slice(3, 7));
 }
 
-/** Phone input / page style: +6016 - 331 3607 */
-export function formatMyPhone(raw) {
-  return format(raw, false);
-}
-
-/** Style used on the generated PDF and image: 016-331 3607 */
-export function formatMyPhoneLocal(raw) {
-  return format(raw, true);
-}
+/** Same format; kept as an alias for the PDF / image code. */
+export const formatMyPhoneLocal = formatMyPhone;
 
 /** Digits only, in international form, for tel: links. */
 export function telHref(formatted) {

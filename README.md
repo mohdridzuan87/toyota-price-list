@@ -22,7 +22,7 @@ Rate, D/P % and tenure live in `config/products.json` → `settings`.
 
 ## For any Toyota sales advisor
 
-The card starts with sample details from `site/data/card.json` (Wan Jasni, +6016 - 331 3607, TOYOTA PCM | Telok Panglima Garang). Each sales advisor taps **Edit card** and replaces them with their own name, job title, phone (auto-formatted as +6016 - 331 3607), company, address, a profile photo (shown in a circle, with zoom and reposition) and up to three extra images. The card is saved in that person's own **browser data (localStorage)** on their phone and never sent anywhere.
+The card starts with sample details from `site/data/card.json` (Wan Jasni, 016-331 3607, TOYOTA PCM | Telok Panglima Garang). Each sales advisor taps **Edit card** and replaces them with their own name, job title, phone (auto-formatted as 016-331 3607), company, address, a profile photo (shown in a circle, with zoom and reposition) and up to three extra images. The card is saved in that person's own **browser data (localStorage)** on their phone and never sent anywhere.
 
 **Share PDF to WhatsApp** and **Download PDF** build a one-page A4 landscape vector PDF in the browser (`site/pdf.js`, jsPDF in `site/vendor/`), with that advisor's own name card on it. On phones the share sheet sends the PDF file; on desktop the PDF is downloaded and WhatsApp Web opens so it can be attached. **Print** uses a matching one-page print layout.
 
