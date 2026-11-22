@@ -154,7 +154,7 @@ export async function buildPdf({ data, card, period, updated }) {
 
   // ---------- column grid inside one model table
   const colW = (PW - 2 * M - 4) / 2;
-  const frac = [0.165, 0.09, 0.155, 0.085, 0.082, 0.085, 0.095, 0.082, 0.085, 0.095];
+  const frac = [0.178, 0.11, 0.121, 0.093, 0.103, 0.121, 0.06, 0.121]; // variant, body, rebate, insurance, [D/P, monthly] x 2 (the loan column is left out so the larger numbers fit)
   const sum = frac.reduce((a, b) => a + b, 0);
   const cw = frac.map((f) => (f / sum) * colW);
   const cx = [0];
@@ -163,10 +163,10 @@ export async function buildPdf({ data, card, period, updated }) {
   const rowInfo = (g, k) => {
     const fs = 6.4 * k;
     return g.variants.map((v) => {
-      const lines = wrap(v.rebate.text + (v.rebate.note ? '*' : ''), cw[2] - 1.6, fs).length;
+      const lines = wrap(v.rebate.text + (v.rebate.note ? '*' : ''), cw[2] - 1.6, fs * 1.3, true).length;
       const nameLines = wrap(v.name, cw[0] - 1.6, fs, true).length;
       const n = Math.max(lines, nameLines);
-      return { v, n, h: 3.9 * k + (n - 1) * 2.5 * k };
+      return { v, n, h: 3.9 * k + (n - 1) * 3.2 * k };
     });
   };
   const blockH = (g, k) => 4.6 * k + 5.6 * k + rowInfo(g, k).reduce((a, r) => a + r.h, 0) + (g.variants.some((v) => v.rebate.note) ? 2.6 * k : 0) + 1.6 * k;
@@ -217,11 +217,11 @@ export async function buildPdf({ data, card, period, updated }) {
     doc.rect(x0, hy, colW, headH, 'F');
     const heads = [
       ['MODEL & VARIANT'], ['BODY', 'PRICE'], ['REBATE'], ['EST.', 'INSURANCE'],
-      [`D/P ${dps[0]}%`], ['LOAN'], [`${s.years} YEARS`, `${dps[0]}% D/P`],
-      [`D/P ${dps[1]}%`], ['LOAN'], [`${s.years} YEARS`, `${dps[1]}% D/P`],
+      [`D/P ${dps[0]}%`], [`${s.years} YEARS`, `${dps[0]}% D/P`],
+      [`D/P ${dps[1]}%`], [`${s.years} YEARS`, `${dps[1]}% D/P`],
     ];
     heads.forEach((lines, i) => {
-      const em = i === 6 || i === 9;
+      const em = i === 5 || i === 7;
       const right = i > 0;
       const px = right ? x0 + cx[i + 1] - 1.1 : x0 + 1.4;
       lines.forEach((ln, li) => {
@@ -241,17 +241,17 @@ export async function buildPdf({ data, card, period, updated }) {
       const mid = ry + r.h / 2;
       const nameLines = wrap(v.name, cw[0] - 1.6, fs, true);
       nameLines.forEach((ln, li) => T(ln, x0 + 1.4, mid + (li - (nameLines.length - 1) / 2) * 2.5 * k, { size: fs, bold: true }));
-      const num = (i, text, o = {}) => T(text, x0 + cx[i + 1] - 1.1, mid, { size: fs, align: 'right', ...o });
+      const nfs = fs * 1.3; // numbers: bold and 30% larger
+      const num = (i, text, o = {}) => T(text, x0 + cx[i + 1] - 1.1, mid, { size: nfs, bold: true, align: 'right', ...o });
       num(1, rm(v.body));
-      const rl = wrap(v.rebate.text + (v.rebate.note ? '*' : ''), cw[2] - 1.6, fs);
-      rl.forEach((ln, li) => T(ln, x0 + cx[3] - 1.1, mid + (li - (rl.length - 1) / 2) * 2.5 * k, { size: fs, align: 'right', color: v.rebate.type === 'none' ? FAINT : INK }));
+      const rl = wrap(v.rebate.text + (v.rebate.note ? '*' : ''), cw[2] - 1.6, nfs, true);
+      rl.forEach((ln, li) => T(ln, x0 + cx[3] - 1.1, mid + (li - (rl.length - 1) / 2) * 3.2 * k, { size: nfs, bold: true, align: 'right', color: v.rebate.type === 'none' ? FAINT : INK }));
       num(3, rm(v.insurance));
       dps.forEach((p, set) => {
         const c = calc(v.body, v.insurance, { ...s, dpPercent: p });
-        const b = 4 + set * 3;
+        const b = 4 + set * 2;
         num(b, rm(c.dp));
-        num(b + 1, rm(c.loan));
-        num(b + 2, rm(c.m90), { bold: true, size: fs * 1.08, color: set === 0 ? RED : INK });
+        num(b + 1, rm(c.m90), { size: nfs * 1.08, color: set === 0 ? RED : INK });
       });
       ry += r.h;
     });
@@ -260,7 +260,7 @@ export async function buildPdf({ data, card, period, updated }) {
     // frame + set divider lines
     doc.setDrawColor(...LINE);
     doc.setLineWidth(0.25);
-    [4, 7].forEach((i) => doc.line(x0 + cx[i], hy, x0 + cx[i], ry));
+    [4, 6].forEach((i) => doc.line(x0 + cx[i], hy, x0 + cx[i], ry));
     doc.roundedRect(x0, y0, colW, totalH, 1.2, 1.2, 'S');
     return totalH;
   };
