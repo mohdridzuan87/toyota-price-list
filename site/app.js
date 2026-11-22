@@ -22,17 +22,26 @@ function myParts(date) {
   return p;
 }
 
-/** Next scheduled refresh after a given date: the 15th, or the 1st of next month. */
+/** Scheduled refresh slots in Malaysia time (UTC+8): [day of month, hour, minute]. Keep in sync with the workflow. */
+const SLOTS = [[1, 7, 30], [2, 7, 0], [3, 7, 0], [15, 8, 0]];
+
+/** The next scheduled refresh strictly after the given moment. */
 function nextUpdate(from) {
-  const { year, month, day } = myParts(from);
-  return day < 15 ? new Date(Date.UTC(year, month - 1, 15, -8)) : new Date(Date.UTC(year, month, 1, -8));
+  const { year, month } = myParts(from);
+  const candidates = [];
+  for (const m of [month, month + 1]) {
+    for (const [d, h, min] of SLOTS) candidates.push(new Date(Date.UTC(year, m - 1, d, h - 8, min)));
+  }
+  return candidates.filter((c) => c > from).sort((x, y) => x - y)[0];
 }
+
+const fmtTime = (d) => new Intl.DateTimeFormat('en-GB', { hour: 'numeric', minute: '2-digit', hour12: true, timeZone: TZ }).format(d).replace(' ', '').toLowerCase();
 
 function renderHeader(data) {
   const gen = new Date(data.generatedAt);
   const period = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric', timeZone: TZ }).format(gen).toUpperCase();
   $('period').textContent = period;
-  $('updated').textContent = `Updated ${fmtDate(gen)} · next auto-update ${fmtDate(nextUpdate(gen))}`;
+  $('updated').textContent = `Updated ${fmtDate(gen)} · next auto-update ${fmtDate(nextUpdate(gen))}, ${fmtTime(nextUpdate(gen))}`;
   document.title = `Toyota Price List – ${period.charAt(0) + period.slice(1).toLowerCase()}`;
   const ageDays = (Date.now() - gen.getTime()) / 86400000;
   if (ageDays > 20) {
@@ -107,7 +116,7 @@ function renderNotes(data) {
   const s = data.settings;
   const items = [
     ...footNotes(s).map(esc),
-    `Auto-updated from toyota.com.my on the 1st and 15th of every month. Sources: <a href="${esc(data.sources.priceList)}">price list</a> · <a href="${esc(data.sources.promo)}">monthly promo</a>.`,
+    `Auto-updated from toyota.com.my on the 1st (7:30am), 2nd (7:00am), 3rd (7:00am) and 15th (8:00am) of every month, Malaysia time. Sources: <a href="${esc(data.sources.priceList)}">price list</a> · <a href="${esc(data.sources.promo)}">monthly promo</a>.`,
   ];
   $('notes').innerHTML = items.map((t) => `<li>${t}</li>`).join('');
 }

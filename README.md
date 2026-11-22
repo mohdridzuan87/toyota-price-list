@@ -4,7 +4,7 @@ Monthly Toyota Malaysia price list as a static web page, hosted on GitHub Pages 
 
 ## What updates automatically
 
-A GitHub Actions workflow (`.github/workflows/update.yml`) runs at **08:00 Malaysia time on the 1st and 15th of every month** (and on demand from the Actions tab → *Run workflow*). It runs `scraper/update.mjs`, commits `site/data/prices.json`, and redeploys the site.
+A GitHub Actions workflow (`.github/workflows/update.yml`) runs at these Malaysia times: **1st 7:30am, 2nd 7:00am, 3rd 7:00am and 15th 8:00am of every month** (and on demand from the Actions tab → *Run workflow*). GitHub cron is UTC only, so each slot is scheduled at its UTC equivalent and a first step checks the real Malaysia day and hour. It runs `scraper/update.mjs`, commits `site/data/prices.json`, and redeploys the site. If you change the slots, change `SLOTS` in `site/app.js` too (it shows the next update time).
 
 | Column | Source |
 | --- | --- |
