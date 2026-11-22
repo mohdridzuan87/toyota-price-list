@@ -154,7 +154,7 @@ export async function buildPdf({ data, card, period, updated }) {
 
   // ---------- column grid inside one model table
   const colW = (PW - 2 * M - 4) / 2;
-  const frac = [0.178, 0.11, 0.121, 0.093, 0.103, 0.121, 0.06, 0.121]; // variant, body, rebate, insurance, [D/P, monthly] x 2 (the loan column is left out so the larger numbers fit)
+  const frac = [0.19, 0.12, 0.13, 0.1, 0.11, 0.13, 0.13]; // variant, body, rebate, insurance, D/P 10%, monthly 10%, monthly 0% (no D/P 0% column: it is always RM0) // variant, body, rebate, insurance, [D/P, monthly] x 2 (the loan column is left out so the larger numbers fit)
   const sum = frac.reduce((a, b) => a + b, 0);
   const cw = frac.map((f) => (f / sum) * colW);
   const cx = [0];
@@ -218,10 +218,10 @@ export async function buildPdf({ data, card, period, updated }) {
     const heads = [
       ['MODEL & VARIANT'], ['BODY', 'PRICE'], ['REBATE'], ['EST.', 'INSURANCE'],
       [`D/P ${dps[0]}%`], [`${s.years} YEARS`, `${dps[0]}% D/P`],
-      [`D/P ${dps[1]}%`], [`${s.years} YEARS`, `${dps[1]}% D/P`],
+      [`${s.years} YEARS`, `${dps[1]}% D/P`],
     ];
     heads.forEach((lines, i) => {
-      const em = i === 5 || i === 7;
+      const em = i === 5 || i === 6;
       const right = i > 0;
       const px = right ? x0 + cx[i + 1] - 1.1 : x0 + 1.4;
       lines.forEach((ln, li) => {
@@ -249,9 +249,8 @@ export async function buildPdf({ data, card, period, updated }) {
       num(3, rm(v.insurance));
       dps.forEach((p, set) => {
         const c = calc(v.body, v.insurance, { ...s, dpPercent: p });
-        const b = 4 + set * 2;
-        num(b, rm(c.dp));
-        num(b + 1, rm(c.m90), { size: nfs * 1.08, color: set === 0 ? RED : INK });
+        if (p > 0) num(4, rm(c.dp));
+        num(set === 0 ? 5 : 6, rm(c.m90), { size: nfs * 1.08, color: set === 0 ? RED : INK });
       });
       ry += r.h;
     });

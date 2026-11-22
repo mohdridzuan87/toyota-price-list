@@ -67,7 +67,7 @@ function renderModels(data) {
   const cols = [
     { h: 'Body price' }, { h: 'Rebate' }, { h: 'Est. insurance' },
     ...dps.flatMap((p, k) => [
-      { h: `D/P ${p}%`, g: k },
+      ...(p > 0 ? [{ h: `D/P ${p}%`, g: k }] : []), // no D/P column for 0%: it would always read RM0
       { h: 'Loan', g: k, cls: 'loan' },
       { h: `${s.years} years`, sub: `${p}% D/P`, g: k, em: true },
     ]),
@@ -84,12 +84,13 @@ function renderModels(data) {
         rebate += '<sup>*</sup>';
       }
       const muted = v.rebate.type === 'none' ? ' muted' : '';
+      let ci = 3;
       const scen = dps.map((p, k) => {
         const c = calc(v.body, v.insurance, { ...s, dpPercent: p });
-        const b = 3 + k * 3;
-        return `<td data-label="${label(b)}" class="g${k}">${rm(c.dp)}</td>
-        <td data-label="${label(b + 1)}" class="loan g${k}">${rm(c.loan)}</td>
-        <td data-label="${label(b + 2)}" class="em g${k}${k ? ' alt' : ''}">${rm(c.m90)}<small> /mth</small></td>`;
+        const dp = p > 0 ? `<td data-label="${label(ci++)}" class="g${k}">${rm(c.dp)}</td>` : '';
+        return dp + `
+        <td data-label="${label(ci++)}" class="loan g${k}">${rm(c.loan)}</td>
+        <td data-label="${label(ci++)}" class="em g${k}${k ? ' alt' : ''}">${rm(c.m90)}<small> /mth</small></td>`;
       }).join('');
       return `<tr>
         <th scope="row" data-label="Variant">${esc(v.name)}${v.hev ? ' <span class="hev">HEV</span>' : ''}</th>

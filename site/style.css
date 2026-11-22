@@ -301,3 +301,22 @@ tbody th, tbody td { padding-left: 8px; padding-right: 8px; }
   tbody th, tbody td { padding-left: 3px; padding-right: 3px; }
   .page { max-width: none; }
 }
+
+/* ---------- no "D/P 0%" column any more: 9 columns */
+@media (min-width: 781px) {
+  table { min-width: 1160px; }
+  thead th:nth-child(1) { width: 14%; }
+  thead th:nth-child(2) { width: 10.5%; }
+  thead th:nth-child(3) { width: 11.5%; }
+  thead th:nth-child(4) { width: 9%; }
+  thead th:nth-child(5) { width: 9.5%; }
+  thead th:nth-child(6) { width: 10.5%; }
+  thead th:nth-child(7) { width: 11%; }
+  thead th:nth-child(8) { width: 10.5%; }
+  thead th:nth-child(9) { width: 11%; }
+  thead th:nth-child(10) { width: auto; }
+}
+@media screen and (max-width: 780px) {
+  tbody td.g1:nth-child(10) { grid-column: auto; }
+  tbody td.g1:nth-child(9) { grid-column: 1 / -1; }
+}
