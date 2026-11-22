@@ -116,10 +116,53 @@ function renderNotes(data) {
 /* ------------------------------------------------------------------ name card */
 
 const KEY = 'toyota-price-list.card.v1';
+// Card data lives on the user's own phone/computer only: localStorage + IndexedDB (two copies),
+// asked to be "persistent" so the browser does not clear it, plus a backup file the user can keep.
+const idb = {
+  open() {
+    return new Promise((res, rej) => {
+      const r = indexedDB.open('toyota-price-list', 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('kv');
+      r.onsuccess = () => res(r.result);
+      r.onerror = () => rej(r.error);
+    });
+  },
+  async get(k) {
+    try {
+      const db = await this.open();
+      return await new Promise((res) => { const q = db.transaction('kv').objectStore('kv').get(k); q.onsuccess = () => res(q.result ?? null); q.onerror = () => res(null); });
+    } catch { return null; }
+  },
+  async set(k, v) {
+    try {
+      const db = await this.open();
+      await new Promise((res, rej) => { const t = db.transaction('kv', 'readwrite'); t.objectStore('kv').put(v, k); t.oncomplete = res; t.onerror = () => rej(t.error); });
+      return true;
+    } catch { return false; }
+  },
+  async del(k) {
+    try {
+      const db = await this.open();
+      await new Promise((res) => { const t = db.transaction('kv', 'readwrite'); t.objectStore('kv').delete(k); t.oncomplete = res; t.onerror = res; });
+    } catch { /* ignore */ }
+  },
+};
 const store = {
-  get() { try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch { return null; } },
-  set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); return true; } catch { return false; } },
-  clear() { try { localStorage.removeItem(KEY); } catch { /* ignore */ } },
+  async get() {
+    try { const v = JSON.parse(localStorage.getItem(KEY) || 'null'); if (v) return v; } catch { /* fall through */ }
+    return idb.get(KEY);
+  },
+  async set(v) {
+    let ls = false;
+    try { localStorage.setItem(KEY, JSON.stringify(v)); ls = true; } catch { /* quota or blocked */ }
+    const db = await idb.set(KEY, v);
+    try { navigator.storage?.persist?.(); } catch { /* ignore */ }
+    return ls || db;
+  },
+  async clear() {
+    try { localStorage.removeItem(KEY); } catch { /* ignore */ }
+    await idb.del(KEY);
+  },
 };
 
 let defaults = { name: '', title: '', phone: '', company: '', address: '', photo: '' };
@@ -149,12 +192,12 @@ function renderCard() {
 let saveTimer;
 function persist() {
   clearTimeout(saveTimer);
-  saveTimer = setTimeout(() => {
+  saveTimer = setTimeout(async () => {
     // store only what differs from the shared defaults, so later changes to data/card.json still show up
     const delta = Object.fromEntries(Object.entries(card).filter(([k, v]) => v !== defaults[k] && !(v === undefined && defaults[k] === undefined)));
-    const ok = Object.keys(delta).length ? store.set(delta) : (store.clear(), true);
+    const ok = Object.keys(delta).length ? await store.set(delta) : (await store.clear(), true);
     const el = $('saved');
-    el.textContent = ok ? 'Saved on this device' : 'Could not save – browser storage is unavailable';
+    el.textContent = ok ? 'Saved on this phone' : 'Could not save – browser storage is unavailable';
     clearTimeout(el._t);
     el._t = setTimeout(() => { el.textContent = ''; }, 2500);
   }, 200);
@@ -244,8 +287,8 @@ async function onPhoto(file) {
   }
 }
 
-function initCard() {
-  const stored = store.get();
+async function initCard() {
+  const stored = await store.get();
   card = { ...defaults, ...(stored || {}) };
   renderCard();
 
@@ -288,6 +331,40 @@ function initCard() {
       drawCrop();
     });
   }
+  $('backup-btn').addEventListener('click', () => {
+    const blob = new Blob([JSON.stringify({ app: 'toyota-price-list-card', version: 1, card }, null, 2)], { type: 'application/json' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'toyota-card-backup.json';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(link.href), 4000);
+    $('saved').textContent = 'Backup file saved to your phone';
+  });
+  $('restore-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    try {
+      const data = JSON.parse(await file.text());
+      const c = data.card || data;
+      const clean = {};
+      for (const k of ['name', 'title', 'phone', 'company', 'address']) if (typeof c[k] === 'string') clean[k] = c[k].slice(0, 200);
+      for (const k of ['photo', 'photoSrc']) if (typeof c[k] === 'string' && c[k].startsWith('data:image/') && c[k].includes(';base64,')) clean[k] = c[k];
+      if (c.adj && [c.adj.z, c.adj.x, c.adj.y].every((n) => Number.isFinite(n))) clean.adj = { z: c.adj.z, x: c.adj.x, y: c.adj.y };
+      if (!Object.keys(clean).length) throw new Error('empty');
+      if (clean.phone) clean.phone = formatMyPhone(clean.phone);
+      card = { ...defaults, ...clean };
+      srcImg = null;
+      if (card.photoSrc) { try { srcImg = await loadImage(card.photoSrc); } catch { /* ignore */ } }
+      fillFields();
+      renderCard();
+      persist();
+    } catch {
+      $('saved').textContent = 'That backup file could not be read.';
+    }
+  });
   $('edit-reset').addEventListener('click', () => {
     clearTimeout(saveTimer);
     store.clear();
@@ -342,7 +419,7 @@ $('wa-btn').addEventListener('click', async () => {
     const r = await fetch('data/card.json', { cache: 'no-cache' });
     if (r.ok) defaults = { ...defaults, ...(await r.json()) };
   } catch { /* use blank defaults */ }
-  initCard();
+  await initCard();
 
   try {
     const data = await loadPrices();

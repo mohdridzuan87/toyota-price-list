@@ -65,9 +65,12 @@
         <div class="panel-actions wide">
           <button class="btn" id="edit-done" type="button">Done</button>
           <button class="btn ghost" id="edit-reset" type="button">Reset to default</button>
+          <button class="btn ghost" id="backup-btn" type="button">Save backup file</button>
+          <label class="btn ghost" for="restore-input">Restore backup</label>
+          <input id="restore-input" type="file" accept="application/json,.json" hidden>
           <span class="saved" id="saved" role="status"></span>
         </div>
-        <p class="hint wide">Changes are saved in this browser only. They do not change what other people see.</p>
+        <p class="hint wide">Your card is stored on this phone only (never sent anywhere), so it is still here next time you open the page. Use Save backup file to keep a copy, e.g. if you change phone. It does not change what other people see.</p>
       </div>
     </form>
 
