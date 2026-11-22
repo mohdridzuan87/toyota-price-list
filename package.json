@@ -1,0 +1,16 @@
+{
+  "name": "toyota-price-list",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Monthly Toyota price list (static page + scheduled scraper)",
+  "scripts": {
+    "update": "node scraper/update.mjs",
+    "serve": "node serve.mjs",
+    "test": "node tests/check.mjs"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "pdfjs-dist": "4.10.38"
+  }
+}

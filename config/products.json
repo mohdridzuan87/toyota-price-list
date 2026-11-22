@@ -1,0 +1,363 @@
+{
+  "settings": {
+    "dpPercent": 10,
+    "ratePercent": 2.3,
+    "years": 9
+  },
+  "sources": {
+    "base": "https://www.toyota.com.my",
+    "priceListPage": "/en/price-and-model-tools/price-list.html",
+    "promoPage": "/en/promotions/monthly-promo.html"
+  },
+  "insurance": {
+    "note": "Toyota does not publish insurance premiums. Estimate = Recommended Sum Insured (from the Toyota price-list PDF) x a per-variant rate calibrated once from the original Excel estimates (est / baseSumInsured), rounded to the nearest RM100."
+  },
+  "groups": [
+    {
+      "id": "yaris",
+      "name": "YARIS",
+      "image": "yaris.jpg",
+      "pdf": "/price-list-maintenance-packages/yaris/",
+      "variants": [
+        {
+          "name": "YARIS 1.E",
+          "promo": null,
+          "rebateDefault": "n/a",
+          "est": 3100,
+          "baseSI": 90000,
+          "hdr": "1\\.5E"
+        },
+        {
+          "name": "YARIS 1.G",
+          "promo": null,
+          "rebateDefault": "n/a",
+          "est": 3300,
+          "baseSI": 96000,
+          "hdr": "1\\.5G"
+        }
+      ]
+    },
+    {
+      "id": "yaris-cross",
+      "name": "YARIS CROSS",
+      "image": "yaris-cross.jpg",
+      "pdf": "/price-list-maintenance-packages/toyota-yaris-cros-and-hev/",
+      "variants": [
+        {
+          "name": "YARIS CROSS 1.5S",
+          "promo": "ALL-NEW YARIS CROSS",
+          "est": 3600,
+          "baseSI": 99000,
+          "hdr": "^(?!.*HEV)"
+        },
+        {
+          "name": "YARIS CROSS 1.5HEV",
+          "promo": "ALL-NEW YARIS CROSS HYBRID ELECTRIC",
+          "est": 3900,
+          "baseSI": 109000,
+          "hdr": "HEV"
+        }
+      ]
+    },
+    {
+      "id": "vios",
+      "name": "VIOS",
+      "image": "vios.jpg",
+      "pdf": "/price-list-maintenance-packages/vios-hev/",
+      "variants": [
+        {
+          "name": "VIOS 1.5E",
+          "promo": "VIOS",
+          "est": 3400,
+          "baseSI": 90000,
+          "hdr": "1\\.5E"
+        },
+        {
+          "name": "VIOS 1.5G",
+          "promo": "VIOS",
+          "est": 3600,
+          "baseSI": 96000,
+          "hdr": "1\\.5G"
+        },
+        {
+          "name": "VIOS 1.5HEV",
+          "promo": "ALL-NEW VIOS HYBRID ELECTRIC",
+          "est": 3700,
+          "baseSI": 103000,
+          "hdr": "^(?!.*GR)(?=.*HEV)"
+        },
+        {
+          "name": "VIOS 1.5HEV GRS",
+          "promo": "ALL-NEW VIOS HEV GR SPORT",
+          "est": 3900,
+          "baseSI": 109000,
+          "hdr": "GR"
+        }
+      ]
+    },
+    {
+      "id": "corolla-altis",
+      "name": "COROLLA ALTIS",
+      "image": "corolla-altis.png",
+      "pdf": "/price-list-maintenance-packages/corolla/",
+      "variants": [
+        {
+          "name": "COROLLA ALTIS 1.8G",
+          "promo": "COROLLA",
+          "est": 4500,
+          "baseSI": 144000,
+          "hdr": "^(?!.*GR).*1\\.8G"
+        },
+        {
+          "name": "COROLLA ALTIS 1.8 GRS",
+          "promo": "NEW COROLLA GR SPORT",
+          "est": 4700,
+          "baseSI": 149000,
+          "hdr": "GR"
+        }
+      ]
+    },
+    {
+      "id": "corolla-cross",
+      "name": "COROLLA CROSS",
+      "image": "corolla-cross.jpg",
+      "pdf": "/price-list-maintenance-packages/corolla-cross/",
+      "variants": [
+        {
+          "name": "COROLLA CROSS 1.8V",
+          "promo": "COROLLA CROSS",
+          "est": 4200,
+          "baseSI": 133000,
+          "hdr": "1\\.8V"
+        },
+        {
+          "name": "COROLLA CROSS 1.8 HEV",
+          "promo": "COROLLA CROSS HYBRID ELECTRIC",
+          "est": 4400,
+          "baseSI": 140000,
+          "hdr": "^(?!.*GR)(?=.*HEV)"
+        },
+        {
+          "name": "COROLLA CROSS 1.8 HEV GRS",
+          "promo": "COROLLA CROSS HEV GR SPORT",
+          "est": 4800,
+          "baseSI": 148000,
+          "hdr": "GR"
+        }
+      ]
+    },
+    {
+      "id": "veloz",
+      "name": "VELOZ",
+      "image": "veloz.png",
+      "pdf": "/price-list-maintenance-packages/veloz/",
+      "variants": [
+        {
+          "name": "VELOZ 1.5G",
+          "promo": "VELOZ",
+          "est": 3500,
+          "baseSI": 94000
+        }
+      ]
+    },
+    {
+      "id": "zenix",
+      "name": "INNOVA ZENIX",
+      "image": "zenix.jpg",
+      "pdf": "/price-list-maintenance-packages/zenix/",
+      "variants": [
+        {
+          "name": "INNOVA ZENIX 2.0V",
+          "promo": "INNOVA ZENIX",
+          "est": 6500,
+          "baseSI": 164000,
+          "hdr": "2\\.0V"
+        },
+        {
+          "name": "INNOVA ZENIX 2.0HEV",
+          "promo": "INNOVA ZENIX HEV",
+          "est": 7000,
+          "baseSI": 201000,
+          "hdr": "HEV"
+        }
+      ]
+    },
+    {
+      "id": "fortuner",
+      "name": "FORTUNER",
+      "image": "fortuner.jpg",
+      "pdf": "/price-list-maintenance-packages/fortuner/",
+      "variants": [
+        {
+          "name": "FORTUNER 2.4",
+          "promo": "FORTUNER",
+          "est": 7000,
+          "baseSI": 194000,
+          "hdr": "2\\.4"
+        },
+        {
+          "name": "FORTUNER 2.7 SRZ",
+          "promo": "FORTUNER",
+          "est": 7200,
+          "baseSI": 201000,
+          "hdr": "2\\.7|SRZ"
+        },
+        {
+          "name": "FORTUNER 2.8 VRZ",
+          "promo": "FORTUNER",
+          "est": 9000,
+          "baseSI": 240000,
+          "hdr": "2\\.8|VRZ"
+        }
+      ]
+    },
+    {
+      "id": "hilux",
+      "name": "HILUX",
+      "image": "hilux.jpg",
+      "pdf": "/price-list-maintenance-packages/hilux/",
+      "variants": [
+        {
+          "name": "HILUX S/C 2.4MT",
+          "promo": "HILUX SINGLE CAB",
+          "est": 4000,
+          "baseSI": 103000,
+          "hdr": "S/CAB"
+        },
+        {
+          "name": "HILUX D/C 2.4E MT",
+          "promo": "HILUX",
+          "est": 4300,
+          "baseSI": 116000,
+          "hdr": "2\\.4E MT"
+        },
+        {
+          "name": "HILUX D/C 2.4E AT",
+          "promo": "HILUX",
+          "est": 4500,
+          "baseSI": 118000,
+          "hdr": "2\\.4E AT"
+        },
+        {
+          "name": "HILUX D/C 2.4V AT",
+          "promo": "HILUX",
+          "est": 5500,
+          "baseSI": 148000,
+          "hdr": "2\\.4V"
+        },
+        {
+          "name": "HILUX D/C ROGUE 2.8 AT",
+          "promo": "HILUX",
+          "est": 6000,
+          "baseSI": 161000,
+          "hdr": "Rogue"
+        },
+        {
+          "name": "HILUX D/C 2.8 GRS",
+          "promo": "HILUX GR SPORT",
+          "est": 6900,
+          "baseSI": 171000,
+          "hdr": "GR-?S"
+        }
+      ]
+    },
+    {
+      "id": "camry",
+      "name": "CAMRY",
+      "image": "camry.jpg",
+      "pdf": "/price-list-maintenance-packages/camry-hev-and-ice/",
+      "variants": [
+        {
+          "name": "CAMRY 2.5 V",
+          "promo": "CAMRY",
+          "est": 10000,
+          "baseSI": 220000,
+          "hdr": "2\\.5\\s?V"
+        },
+        {
+          "name": "CAMRY 2.5 HEV",
+          "promo": "CAMRY HEV",
+          "est": 12000,
+          "baseSI": 247000,
+          "hdr": "HEV"
+        }
+      ]
+    },
+    {
+      "id": "hiace",
+      "name": "HIACE",
+      "image": "hiace.jpg",
+      "pdf": "/price-list-maintenance-packages/hiace/",
+      "variants": [
+        {
+          "name": "HIACE 3.0 P/VAN",
+          "promo": "HIACE",
+          "est": 4500,
+          "baseSI": 127000
+        }
+      ]
+    },
+    {
+      "id": "grand-hiace",
+      "name": "GRAND HIACE",
+      "image": "grand-hiace.jpg",
+      "pdf": "/price-list-maintenance-packages/all-new-hiace/",
+      "variants": [
+        {
+          "name": "HIACE 2.8D W/VAN",
+          "promo": null,
+          "est": 5800,
+          "baseSI": 170000
+        }
+      ]
+    },
+    {
+      "id": "vellfire",
+      "name": "VELLFIRE",
+      "image": "vellfire.jpg",
+      "pdf": "/price-list-maintenance-packages/vellfire/",
+      "variants": [
+        {
+          "name": "VELLFIRE 2.5 AT",
+          "promo": null,
+          "est": 14000,
+          "baseSI": 446000
+        },
+        {
+          "name": "VELLFIRE 2.5 HEV",
+          "promo": null,
+          "est": 15000,
+          "baseSI": 548000
+        }
+      ]
+    },
+    {
+      "id": "alphard",
+      "name": "ALPHARD",
+      "image": "alphard.jpg",
+      "pdf": "/price-list-maintenance-packages/alphard/",
+      "variants": [
+        {
+          "name": "ALPHARD 2.4T",
+          "promo": null,
+          "est": 16000,
+          "baseSI": 547000
+        }
+      ]
+    },
+    {
+      "id": "harrier",
+      "name": "HARRIER",
+      "image": "harrier.jpg",
+      "pdf": "/price-list-maintenance-packages/harrier-hev/",
+      "variants": [
+        {
+          "name": "HARRIER 2.5HEV",
+          "promo": null,
+          "est": 7000,
+          "baseSI": 287000
+        }
+      ]
+    }
+  ]
+}

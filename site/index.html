@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="robots" content="noindex">
+  <title>Toyota Price List</title>
+  <meta name="description" content="Monthly Toyota Malaysia price list with rebates, estimated insurance, 10% down payment and 9-year monthly instalment.">
+  <link rel="icon" href="assets/toyota-logo.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="masthead">
+      <img class="logo" src="assets/toyota-logo.png" alt="Toyota – Move your world" width="150" height="90">
+      <div class="title">
+        <p class="eyebrow">Price list</p>
+        <h1 id="period">&nbsp;</h1>
+        <p class="updated" id="updated"></p>
+      </div>
+      <button class="btn ghost no-print" id="print-btn" type="button">Print / Save PDF</button>
+    </header>
+
+    <div class="banner no-print" id="stale" role="status" hidden></div>
+
+    <section class="namecard" id="namecard" aria-label="Sales advisor name card">
+      <div class="avatar" id="avatar" aria-hidden="true"><img id="avatar-img" alt="" hidden><span id="avatar-initials"></span></div>
+      <div class="who">
+        <h2 id="c-name"></h2>
+        <p class="role" id="c-title"></p>
+        <p><a class="phone" id="c-phone" href="#"></a></p>
+        <p class="company" id="c-company"></p>
+        <p class="address" id="c-address"></p>
+      </div>
+      <button class="btn no-print" id="edit-btn" type="button" aria-expanded="false" aria-controls="edit-panel">Edit card</button>
+    </section>
+
+    <form class="editpanel no-print" id="edit-panel" hidden autocomplete="off">
+      <div class="photo-edit">
+        <div class="avatar big" id="avatar-preview"><img id="preview-img" alt="Profile photo preview" hidden><span id="preview-initials"></span></div>
+        <div class="photo-actions">
+          <label class="btn small" for="photo-input">Choose photo</label>
+          <input id="photo-input" type="file" accept="image/*" hidden>
+          <button class="btn small ghost" id="photo-remove" type="button">Remove</button>
+        </div>
+        <div class="adjust" id="adjust" hidden>
+          <label>Zoom <input id="adj-zoom" type="range" min="1" max="3" step="0.01" value="1"></label>
+          <label>Left / right <input id="adj-x" type="range" min="-100" max="100" step="1" value="0"></label>
+          <label>Up / down <input id="adj-y" type="range" min="-100" max="100" step="1" value="0"></label>
+        </div>
+      </div>
+      <div class="fields">
+        <label>Name <input id="f-name" type="text" maxlength="60" placeholder="Full name"></label>
+        <label>Job title <input id="f-title" type="text" maxlength="40" placeholder="Sales Advisor"></label>
+        <label>Phone number <input id="f-phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="18" placeholder="+60 16-331 3607">
+          <small>Formats automatically, e.g. +60 16-331 3607</small></label>
+        <label>Company name <input id="f-company" type="text" maxlength="80" placeholder="Company name"></label>
+        <label class="wide">Company address <textarea id="f-address" rows="3" maxlength="200" placeholder="Company address"></textarea></label>
+        <div class="panel-actions wide">
+          <button class="btn" id="edit-done" type="button">Done</button>
+          <button class="btn ghost" id="edit-reset" type="button">Reset to default</button>
+          <span class="saved" id="saved" role="status"></span>
+        </div>
+        <p class="hint wide">Changes are saved in this browser only. They do not change what other people see.</p>
+      </div>
+    </form>
+
+    <section class="assump" id="assump" aria-label="Calculation assumptions"></section>
+
+    <main id="models" aria-live="polite"><p class="loading">Loading price list…</p></main>
+
+    <section class="docs" aria-labelledby="docs-h">
+      <h2 id="docs-h">Required documents</h2>
+      <div class="docs-grid">
+        <div>
+          <h3>Individual</h3>
+          <ol>
+            <li>IC copy</li>
+            <li>Licence copy</li>
+            <li>Payslip 3 or 6 months</li>
+            <li>Bank statement 3 or 6 months</li>
+            <li>KWSP statement / EA form</li>
+          </ol>
+        </div>
+        <div>
+          <h3>Company (SSM)</h3>
+          <ol>
+            <li>IC director &amp; SSM company copy</li>
+            <li>Bank statement 6 months</li>
+            <li>Income tax slip</li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot" id="foot">
+      <ul class="notes" id="notes"></ul>
+      <div class="foot-logos">
+        <img src="assets/pcm-topmark.jpg" alt="PCM Group and Topmark" height="40">
+        <img src="assets/gr.jpg" alt="Toyota Gazoo Racing" height="28">
+      </div>
+    </footer>
+  </div>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
