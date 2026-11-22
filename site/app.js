@@ -28,7 +28,7 @@ function nextUpdate(from) {
 
 function renderHeader(data) {
   const gen = new Date(data.generatedAt);
-  const period = new Intl.DateTimeFormat('en-GB', { month: 'long', year: 'numeric', timeZone: TZ }).format(gen).toUpperCase();
+  const period = $('period').textContent.trim().split(' ').join('-');
   $('period').textContent = period;
   $('updated').textContent = `Updated ${fmtDate(gen)} · next auto-update ${fmtDate(nextUpdate(gen))}`;
   document.title = `Toyota Price List – ${period.charAt(0) + period.slice(1).toLowerCase()}`;
@@ -303,13 +303,38 @@ function initCard() {
 
 $('print-btn').addEventListener('click', () => window.print());
 
-$('wa-btn').addEventListener('click', () => {
-  const url = location.origin + location.pathname;
-  const lines = [`*Toyota Price List ${$('period').textContent.trim()}*`, 'Body price, rebate, D/P and 9-year monthly instalment for all models:', url, ''];
-  if (card.name) lines.push(card.name + (card.title ? ' – ' + card.title : ''));
-  if (card.phone) lines.push(card.phone);
-  if (card.company) lines.push(card.company);
-  window.open('https://wa.me/?text=' + encodeURIComponent(lines.join(String.fromCharCode(10))), '_blank', 'noopener');
+/** Share the generated PDF itself (not a text message). Phones: share sheet -> WhatsApp. Desktop: download + open WhatsApp. */
+function shareStatus(msg) { const el = $('share-status'); el.textContent = msg; clearTimeout(el._t); el._t = setTimeout(() => { el.textContent = ''; }, 8000); }
+
+$('wa-btn').addEventListener('click', async () => {
+  const btn = $('wa-btn');
+  btn.disabled = true;
+  try {
+    const res = await fetch('price-list.pdf', { cache: 'no-cache' });
+    if (!res.ok) throw new Error('PDF not found');
+    const blob = await res.blob();
+    const period = $('period').textContent.trim().split(' ').join('-');
+    const file = new File([blob], 'Toyota-Price-List-' + period + '.pdf', { type: 'application/pdf' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file] });
+      return;
+    }
+    // no file sharing in this browser: save the PDF, then open WhatsApp so it can be attached
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = file.name;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(link.href), 4000);
+    shareStatus('PDF downloaded – attach it in the WhatsApp chat that just opened.');
+    window.open('https://web.whatsapp.com/', '_blank', 'noopener');
+  } catch (err) {
+    if (err && err.name === 'AbortError') return; // user closed the share sheet
+    shareStatus('Could not share the PDF (' + (err && err.message ? err.message : 'error') + '). Use Download PDF instead.');
+  } finally {
+    btn.disabled = false;
+  }
 });
 
 (async function start() {
