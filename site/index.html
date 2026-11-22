@@ -21,7 +21,7 @@
       </div>
       <div class="actions no-print">
         <button class="btn wa" id="wa-btn" type="button">Share PDF to WhatsApp</button>
-        <a class="btn ghost" href="price-list.pdf" download>Download PDF</a>
+        <button class="btn ghost" id="dl-btn" type="button">Download PDF</button>
         <button class="btn ghost" id="print-btn" type="button">Print</button>
         <span class="share-status" id="share-status" role="status"></span>
       </div>
@@ -37,6 +37,7 @@
         <p><a class="phone" id="c-phone" href="#"></a></p>
         <p class="company" id="c-company"></p>
         <p class="address" id="c-address"></p>
+        <p class="setup-hint no-print" id="setup-hint">Tap <b>Edit card</b> to add your own name, phone, company and photo. It is saved on your phone only, and it goes onto the PDF you share.</p>
       </div>
       <button class="btn no-print" id="edit-btn" type="button" aria-expanded="false" aria-controls="edit-panel">Edit card</button>
     </section>
@@ -56,11 +57,11 @@
         </div>
       </div>
       <div class="fields">
-        <label>Name <input id="f-name" type="text" maxlength="60" placeholder="Full name"></label>
+        <label>Name <input id="f-name" type="text" maxlength="60" placeholder="Wan Jasni"></label>
         <label>Job title <input id="f-title" type="text" maxlength="40" placeholder="Sales Advisor"></label>
-        <label>Phone number <input id="f-phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="18" placeholder="+60 16-331 3607">
-          <small>Formats automatically, e.g. +60 16-331 3607</small></label>
-        <label>Company name <input id="f-company" type="text" maxlength="80" placeholder="Company name"></label>
+        <label>Phone number <input id="f-phone" type="tel" inputmode="tel" autocomplete="tel" maxlength="18" placeholder="+6016 - 331 3607">
+          <small>Formats automatically, e.g. +6016 - 331 3607</small></label>
+        <label>Company name <input id="f-company" type="text" maxlength="80" placeholder="TOYOTA PCM | Telok Panglima Garang"></label>
         <label class="wide">Company address <textarea id="f-address" rows="3" maxlength="200" placeholder="Company address"></textarea></label>
         <div class="panel-actions wide">
           <button class="btn" id="edit-done" type="button">Done</button>
@@ -104,11 +105,7 @@
 
     <footer class="foot" id="foot">
       <ul class="notes" id="notes"></ul>
-      <div class="foot-logos">
-        <img src="assets/pcm-topmark.jpg" alt="PCM Group and Topmark" height="40">
-        <img src="assets/gr.jpg" alt="Toyota Gazoo Racing" height="28">
-      </div>
-    </footer>
+      </footer>
   </div>
   <script type="module" src="app.js"></script>
 </body>

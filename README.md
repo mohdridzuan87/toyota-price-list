@@ -20,9 +20,13 @@ The header month and year (`NOVEMBER 2026`) come from the time the data was gene
 
 Rate, D/P % and tenure live in `config/products.json` → `settings`.
 
-## Name card
+## For any Toyota sales advisor
 
-The card at the top can be edited in the browser (name, job title, phone with Malaysian format, company, address, and a profile photo shown in a circle with zoom / reposition). Edits are saved in that browser only (localStorage). Shared defaults are in `site/data/card.json`.
+The page is generic: nobody's name is built in. The first time a sales advisor opens it, the name card is empty (greyed examples are shown). They tap **Edit card** and fill in name, job title, phone (auto-formatted as +6016 - 331 3607), company and a profile photo (shown in a circle, with zoom and reposition). The card is stored **on that person's own phone** (localStorage + IndexedDB, asked to be persistent) and never sent anywhere. **Save backup file / Restore backup** keep a copy on the phone.
+
+**Share PDF to WhatsApp** and **Download PDF** build a one-page A4 landscape vector PDF in the browser (`site/pdf.js`, jsPDF in `site/vendor/`), with that advisor's own name card on it. On phones the share sheet sends the PDF file; on desktop the PDF is downloaded and WhatsApp Web opens so it can be attached. **Print** uses a matching one-page print layout.
+
+Shared defaults for the card are in `site/data/card.json` (blank by default).
 
 ## If a model fails to update
 

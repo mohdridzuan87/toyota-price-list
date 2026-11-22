@@ -1,6 +1,6 @@
 // Malaysian phone number formatter (works while typing).
-//   mobile   0163313607  -> +60 16-331 3607   (011: +60 11-2345 6789)
-//   landline 0312228028  -> +60 3-1222 8028   (other states: +60 4-123 4567)
+//   mobile   0163313607  -> +6016 - 331 3607   (011: +6011 - 2345 6789)
+//   landline 0312228028  -> +603 - 1222 8028   (other states: +604 - 123 4567)
 export function formatMyPhone(raw) {
   let d = String(raw ?? '').replace(/\D/g, '');
   if (!d) return '';
@@ -11,7 +11,7 @@ export function formatMyPhone(raw) {
 
   const join = (area, ...rest) => {
     const parts = rest.filter(Boolean);
-    return '+60 ' + area + (parts.length ? '-' + parts[0] : '') + (parts[1] ? ' ' + parts[1] : '');
+    return '+60' + area + (parts.length ? ' - ' + parts[0] : '') + (parts[1] ? ' ' + parts[1] : '');
   };
 
   if (d[0] === '1') {

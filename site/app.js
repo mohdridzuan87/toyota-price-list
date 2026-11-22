@@ -1,5 +1,7 @@
 import { calc, rm } from './calc.js';
 import { formatMyPhone, telHref } from './phone.js';
+import { notes as footNotes } from './notes.js';
+import { buildPdf } from './pdf.js';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -104,10 +106,7 @@ function renderModels(data) {
 function renderNotes(data) {
   const s = data.settings;
   const items = [
-    'Body price = On-The-Road price without insurance (Individual, Peninsular Malaysia) from the UMW Toyota Motor price list. Rebates follow the Toyota Malaysia monthly promotions page and are subject to terms and conditions; the rebate is not deducted from the body price in the figures above.',
-    `Est. insurance is an indicative figure, not a quotation. Toyota does not publish premiums, so it is calculated from Toyota's Recommended Sum Insured; your actual premium depends on your profile, NCD and cover.`,
-    `D/P ${s.dpPercent}% = ${s.dpPercent}% × (body price + est. insurance); D/P 0% = no down payment. Loan = body price − D/P. Monthly = (loan × ${s.ratePercent}% × ${s.years} years + loan) ÷ ${s.years * 12}, flat rate. With 0% D/P the whole body price is financed (insurance is still payable separately).`,
-    'All figures are estimates and subject to bank approval. Prices, rebates and promotions may change at any time without prior notice.',
+    ...footNotes(s).map(esc),
     `Auto-updated from toyota.com.my on the 1st and 15th of every month. Sources: <a href="${esc(data.sources.priceList)}">price list</a> · <a href="${esc(data.sources.promo)}">monthly promo</a>.`,
   ];
   $('notes').innerHTML = items.map((t) => `<li>${t}</li>`).join('');
@@ -116,6 +115,7 @@ function renderNotes(data) {
 /* ------------------------------------------------------------------ name card */
 
 const KEY = 'toyota-price-list.card.v1';
+const PH = { name: 'Wan Jasni', phone: '+6016 - 331 3607', company: 'TOYOTA PCM | Telok Panglima Garang' }; // greyed examples until the advisor fills in their own
 // Card data lives on the user's own phone/computer only: localStorage + IndexedDB (two copies),
 // asked to be "persistent" so the browser does not clear it, plus a backup file the user can keep.
 const idb = {
@@ -177,13 +177,15 @@ function setPhoto(imgEl, initEl, photo, name) {
 }
 
 function renderCard() {
-  $('c-name').textContent = card.name;
+  $('c-name').textContent = card.name || PH.name;
+  $('namecard').classList.toggle('empty', !card.name && !card.phone && !card.company && !card.address);
   $('c-title').textContent = card.title;
   const ph = $('c-phone');
-  ph.textContent = card.phone;
-  ph.href = telHref(card.phone) || '#';
-  ph.hidden = !card.phone;
-  $('c-company').textContent = card.company;
+  ph.textContent = card.phone || PH.phone;
+  if (card.phone) ph.href = telHref(card.phone); else ph.removeAttribute('href');
+  ph.classList.toggle('ph', !card.phone);
+  $('c-company').textContent = card.company || PH.company;
+  $('c-company').classList.toggle('ph', !card.company);
   $('c-address').textContent = card.address;
   setPhoto($('avatar-img'), $('avatar-initials'), card.photo, card.name);
   setPhoto($('preview-img'), $('preview-initials'), card.photo, card.name);
@@ -381,15 +383,29 @@ async function initCard() {
 $('print-btn').addEventListener('click', () => window.print());
 
 /** Share the generated PDF itself (not a text message). Phones: share sheet -> WhatsApp. Desktop: download + open WhatsApp. */
+let lastData = null;
+async function makePdf() {
+  if (!lastData) throw new Error('price list not loaded yet');
+  return buildPdf({ data: lastData, card, period: $('period').textContent.trim(), updated: $('updated').textContent.trim() });
+}
+function saveBlob(blob, name) {
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = name;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(link.href), 4000);
+}
+const pdfName = () => 'Toyota-Price-List-' + $('period').textContent.trim().split(' ').join('-') + '.pdf';
+
 function shareStatus(msg) { const el = $('share-status'); el.textContent = msg; clearTimeout(el._t); el._t = setTimeout(() => { el.textContent = ''; }, 8000); }
 
 $('wa-btn').addEventListener('click', async () => {
   const btn = $('wa-btn');
   btn.disabled = true;
   try {
-    const res = await fetch('price-list.pdf', { cache: 'no-cache' });
-    if (!res.ok) throw new Error('PDF not found');
-    const blob = await res.blob();
+    const blob = await makePdf();
     const period = $('period').textContent.trim().split(' ').join('-');
     const file = new File([blob], 'Toyota-Price-List-' + period + '.pdf', { type: 'application/pdf' });
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -414,6 +430,14 @@ $('wa-btn').addEventListener('click', async () => {
   }
 });
 
+$('dl-btn').addEventListener('click', async () => {
+  const btn = $('dl-btn');
+  btn.disabled = true;
+  try { saveBlob(await makePdf(), pdfName()); }
+  catch (err) { shareStatus('Could not create the PDF (' + (err && err.message ? err.message : 'error') + ').'); }
+  finally { btn.disabled = false; }
+});
+
 (async function start() {
   try {
     const r = await fetch('data/card.json', { cache: 'no-cache' });
@@ -423,6 +447,7 @@ $('wa-btn').addEventListener('click', async () => {
 
   try {
     const data = await loadPrices();
+    lastData = data;
     renderHeader(data);
     renderAssumptions(data.settings);
     renderModels(data);
