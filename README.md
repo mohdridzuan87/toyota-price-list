@@ -48,3 +48,5 @@ Prices are estimates for reference. Always confirm with the official Toyota pric
 Extra images: besides the circular profile photo, the card has three more image slots (company logo plus two others). They show beside the details on the page and are drawn on the PDF (up to 11 mm tall). They are saved in the browser with the rest of the card.
 
 **Image for WhatsApp Catalogue** exports the same sheet as one high-resolution picture (4200 x 2970 px, PNG; JPEG 95% only if the PNG would be over ~4.8 MB) so it stays sharp when a customer zooms in. It is drawn by `site/canvasdoc.js`, a small canvas stand-in for jsPDF, so the layout is identical to the PDF.
+
+**WhatsApp QR code:** made automatically from the phone number on the card (mobile numbers only; `site/qr.js`, vendored qrcode-generator, MIT). It opens a WhatsApp chat with that number (`https://wa.me/60...`). It is shown on the name card, on the PDF and on the catalogue image, and its size is 1.3 x the profile picture (30% larger).

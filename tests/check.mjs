@@ -5,6 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { calc } from '../site/calc.js';
 import { formatMyPhone, formatMyPhoneLocal } from '../site/phone.js';
+import { waNumber, waLink } from '../site/qr.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const data = JSON.parse(await fs.readFile(path.join(ROOT, 'site/data/prices.json'), 'utf8'));
@@ -99,6 +100,14 @@ const L = [
   ['', ''],
 ];
 for (const [i, o] of L) eq('local phone "' + i + '"', formatMyPhoneLocal(i), o);
+
+// WhatsApp link behind the QR code
+eq('wa 016', waLink('016-331 3607'), 'https://wa.me/60163313607');
+eq('wa +60', waLink('+6016 - 331 3607'), 'https://wa.me/60163313607');
+eq('wa 011', waNumber('011-2345 6789'), '601123456789');
+eq('wa landline', waNumber('03-1222 8028'), null);
+eq('wa partial', waNumber('016-33'), null);
+eq('wa empty', waNumber(''), null);
 
 console.log(fail ? `\n${fail} check(s) FAILED` : `All checks passed (${seen.size} variants vs Excel, phone formats)`);
 process.exit(fail ? 1 : 0);

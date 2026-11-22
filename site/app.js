@@ -2,6 +2,7 @@ import { calc, rm } from './calc.js';
 import { formatMyPhone, telHref } from './phone.js';
 import { notes as footNotes } from './notes.js';
 import { buildPdf, buildImage } from './pdf.js';
+import { waLink, qrMatrix, qrSvg } from './qr.js';
 
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -185,6 +186,22 @@ async function readLogo(file) {
   } finally { URL.revokeObjectURL(url); }
 }
 
+let qrToken = 0;
+/** WhatsApp QR from the phone number on the card (mobile numbers only). */
+async function renderQr() {
+  const token = ++qrToken;
+  const link = waLink(card.phone);
+  const box = $('card-qr');
+  if (!link) { box.hidden = true; return; }
+  try {
+    const m = await qrMatrix(link);
+    if (token !== qrToken) return; // a newer keystroke already replaced this one
+    $('qr-box').innerHTML = qrSvg(m);
+    box.href = link;
+    box.hidden = false;
+  } catch { box.hidden = true; }
+}
+
 function renderCard() {
   $('c-name').textContent = card.name || PH.name;
   $('namecard').classList.toggle('unedited', Object.keys(card).every((k) => (card[k] ?? '') === (defaults[k] ?? '')));
@@ -200,6 +217,7 @@ function renderCard() {
   setPhoto($('avatar-img'), $('avatar-initials'), card.photo, card.name);
   setPhoto($('preview-img'), $('preview-initials'), card.photo, card.name);
   renderLogos();
+  renderQr();
 }
 
 let saveTimer;

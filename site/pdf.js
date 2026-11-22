@@ -4,6 +4,7 @@ import { calc, rm } from './calc.js';
 import { notes, DOCS } from './notes.js';
 import { createCanvasDoc } from './canvasdoc.js';
 import { formatMyPhoneLocal } from './phone.js';
+import { waLink, qrMatrix } from './qr.js';
 
 let libPromise;
 function loadJsPdf() {
@@ -120,6 +121,14 @@ async function drawSheet(doc, { data, card, period, updated }) {
   }))).filter(Boolean);
   const logosW = logos.reduce((a, l) => a + l.w, 0) + Math.max(0, logos.length - 1) * 4;
 
+  // WhatsApp QR code from the phone number: 30% larger than the profile picture (11 mm -> 14.3 mm)
+  let qr = null;
+  const wa = waLink(card.phone);
+  if (wa) { try { qr = await qrMatrix(wa); } catch { qr = null; } }
+  const QR = 11 * 1.3;
+  const qrBlockW = qr ? QR + 2 + 14 : 0; // the code + gap + the "SCAN TO WHATSAPP" caption
+  const rightW = (logosW ? logosW + 4 : 0) + (qrBlockW ? qrBlockW + 4 : 0);
+
   await doc.preload?.([logo, avatar, ...cars, ...logos.map((l) => l.src)]); // only the canvas drawer needs this
 
   // ---------- header
@@ -141,27 +150,51 @@ async function drawSheet(doc, { data, card, period, updated }) {
   y += 2.4;
 
   // ---------- name card (skipped when nothing is filled in)
-  const hasCard = card.name || card.phone || card.company || card.address || logos.length;
+  const hasCard = card.name || card.phone || card.company || card.address || logos.length || qr;
   if (hasCard) {
-    const h = 15;
+    const h = qr ? 18 : 15;
+    const o = (h - 15) / 2; // centre the text block when the card is taller
     doc.setDrawColor(...INK);
     doc.setLineWidth(0.35);
     doc.roundedRect(M, y, PW - 2 * M, h, 1.8, 1.8, 'S');
-    doc.addImage(avatar, 'PNG', M + 3, y + 2, 11, 11);
+    doc.addImage(avatar, 'PNG', M + 3, y + 2 + o, 11, 11);
     doc.setDrawColor(...RED);
     doc.setLineWidth(0.5);
-    doc.circle(M + 8.5, y + 7.5, 6.1, 'S');
+    doc.circle(M + 8.5, y + 7.5 + o, 6.1, 'S');
     const x1 = M + 19;
-    T((card.name || '').toUpperCase(), x1, y + 4.2, { size: 12, bold: true });
-    if (card.title) T(card.title, x1, y + 8, { size: 7, bold: true });
-    if (card.phone) T(formatMyPhoneLocal(card.phone), x1, y + 12, { size: 13, bold: true }); // 016-331 3607 on the PDF / image
+    T((card.name || '').toUpperCase(), x1, y + 4.2 + o, { size: 12, bold: true });
+    if (card.title) T(card.title, x1, y + 8 + o, { size: 7, bold: true });
+    if (card.phone) T(formatMyPhoneLocal(card.phone), x1, y + 12 + o, { size: 13, bold: true }); // 016-331 3607 on the PDF / image
     const x2 = M + 108;
-    if (card.company) T(card.company.toUpperCase(), x2, y + 4.6, { size: 9, bold: true });
+    if (card.company) T(card.company.toUpperCase(), x2, y + 4.6 + o, { size: 9, bold: true });
     if (card.address) {
-      const lines = wrap(card.address, PW - M - x2 - 4 - (logosW ? logosW + 4 : 0), 7).slice(0, 3);
-      lines.forEach((ln, i) => T(ln, x2, y + 8.2 + i * 2.9, { size: 7, color: MUTED }));
+      const lines = wrap(card.address, PW - M - x2 - 4 - rightW, 7).slice(0, 3);
+      lines.forEach((ln, i) => T(ln, x2, y + 8.2 + o + i * 2.9, { size: 7, color: MUTED }));
     }
-    let lx = PW - M - 3 - logosW;
+    let rx = PW - M - 3; // right edge for the right-hand items, working leftwards
+    if (qr) {
+      const qx = rx - QR;
+      const qy = y + (h - QR) / 2;
+      const quiet = 2;
+      const u = QR / (qr.n + quiet * 2);
+      doc.setFillColor(255, 255, 255);
+      doc.rect(qx, qy, QR, QR, 'F');
+      doc.setFillColor(0, 0, 0);
+      for (let r = 0; r < qr.n; r++) {
+        let c = 0;
+        while (c < qr.n) {
+          if (!qr.isDark(r, c)) { c++; continue; }
+          let run = 1;
+          while (c + run < qr.n && qr.isDark(r, c + run)) run++;
+          doc.rect(qx + (c + quiet) * u, qy + (r + quiet) * u, run * u + 0.02, u + 0.02, 'F');
+          c += run;
+        }
+      }
+      T('SCAN TO', qx - 2, y + h / 2 - 1.4, { size: 5.6, bold: true, align: 'right' });
+      T('WHATSAPP', qx - 2, y + h / 2 + 1.4, { size: 5.6, bold: true, align: 'right' });
+      rx = qx - 2 - 14 - 4;
+    }
+    let lx = rx - logosW;
     logos.forEach((l) => {
       doc.addImage(l.src, fmtOf(l.src), lx, y + (h - l.h) / 2, l.w, l.h);
       lx += l.w + 4;
