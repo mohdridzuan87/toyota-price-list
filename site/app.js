@@ -43,7 +43,7 @@ function renderHeader(data) {
 function renderAssumptions(s) {
   const chips = [
     `Est. rate ${s.ratePercent}% p.a. (flat)`,
-    `Down payment ${s.dpPercent}%`,
+    `Down payment ${s.dpPercent}% or 0%`,
     `${s.years}-year tenure`,
     'OTR prices, Peninsular Malaysia',
   ];
@@ -52,28 +52,40 @@ function renderAssumptions(s) {
 
 function renderModels(data) {
   const s = data.settings;
-  const heads = ['Body price', 'Rebate', 'Est. insurance', `D/P ${s.dpPercent}%`, 'Loan after D/P', `${s.years} years / ${100 - s.dpPercent}%`, `${s.years} years / 100%`];
-  const thead = `<thead><tr><th scope="col">Model &amp; variant</th>${heads.map((h, i) => `<th scope="col" class="${i >= 5 ? 'em' : ''}">${esc(h)}${i >= 5 ? `<small>est. ${s.ratePercent}%</small>` : ''}${i === 6 ? '<small>no D/P</small>' : ''}</th>`).join('')}</tr></thead>`;
+  const dps = [s.dpPercent, 0]; // 10% D/P, then 0% D/P beside it
+  const cols = [
+    { h: 'Body price' }, { h: 'Rebate' }, { h: 'Est. insurance' },
+    ...dps.flatMap((p, k) => [
+      { h: `D/P ${p}%`, g: k },
+      { h: 'Loan', g: k, cls: 'loan' },
+      { h: `${s.years} years`, sub: `${p}% D/P`, g: k, em: true },
+    ]),
+  ];
+  const thead = `<thead><tr><th scope="col">Model &amp; variant</th>${cols.map((c) => `<th scope="col" class="${[c.em ? 'em' : '', c.cls || '', c.g !== undefined ? 'g' + c.g : ''].join(' ')}">${esc(c.h)}${c.sub ? `<small>${esc(c.sub)}</small>` : ''}</th>`).join('')}</tr></thead>`;
+  const label = (i) => (cols[i].g === undefined ? cols[i].h : `${cols[i].h} (${dps[cols[i].g]}% D/P)`);
 
   const html = data.groups.map((g) => {
     const notes = [];
     const rows = g.variants.map((v) => {
-      const c = calc(v.body, v.insurance, s);
       let rebate = esc(v.rebate.text);
       if (v.rebate.note) {
         if (!notes.includes(v.rebate.note)) notes.push(v.rebate.note);
         rebate += '<sup>*</sup>';
       }
       const muted = v.rebate.type === 'none' ? ' muted' : '';
+      const scen = dps.map((p, k) => {
+        const c = calc(v.body, v.insurance, { ...s, dpPercent: p });
+        const b = 3 + k * 3;
+        return `<td data-label="${label(b)}" class="g${k}">${rm(c.dp)}</td>
+        <td data-label="${label(b + 1)}" class="loan g${k}">${rm(c.loan)}</td>
+        <td data-label="${label(b + 2)}" class="em g${k}${k ? ' alt' : ''}">${rm(c.m90)}<small> /mth</small></td>`;
+      }).join('');
       return `<tr>
         <th scope="row" data-label="Variant">${esc(v.name)}${v.hev ? ' <span class="hev">HEV</span>' : ''}</th>
-        <td data-label="${heads[0]}">${rm(v.body)}</td>
-        <td data-label="${heads[1]}" class="${muted}">${rebate}</td>
-        <td data-label="${heads[2]}" title="Recommended sum insured ${rm(v.sumInsured)}">${rm(v.insurance)}</td>
-        <td data-label="${heads[3]}">${rm(c.dp)}</td>
-        <td data-label="${heads[4]}">${rm(c.loan)}</td>
-        <td data-label="${heads[5]}" class="em">${rm(c.m90)}<small> /mth</small></td>
-        <td data-label="${heads[6]}" class="em alt">${rm(c.m100)}<small> /mth</small></td>
+        <td data-label="${label(0)}">${rm(v.body)}</td>
+        <td data-label="${label(1)}" class="${muted}">${rebate}</td>
+        <td data-label="${label(2)}" title="Recommended sum insured ${rm(v.sumInsured)}">${rm(v.insurance)}</td>
+        ${scen}
       </tr>`;
     }).join('');
     const eff = g.effective ? `Price list effective ${fmtDate(new Date(g.effective + 'T00:00:00+08:00'))}` : '';
@@ -94,7 +106,7 @@ function renderNotes(data) {
   const items = [
     'Body price = On-The-Road price without insurance (Individual, Peninsular Malaysia) from the UMW Toyota Motor price list. Rebates follow the Toyota Malaysia monthly promotions page and are subject to terms and conditions; the rebate is not deducted from the body price in the figures above.',
     `Est. insurance is an indicative figure, not a quotation. Toyota does not publish premiums, so it is calculated from Toyota's Recommended Sum Insured; your actual premium depends on your profile, NCD and cover.`,
-    `D/P ${s.dpPercent}% = ${s.dpPercent}% × (body price + est. insurance). Loan = body price − D/P. Monthly = (loan × ${s.ratePercent}% × ${s.years} years + loan) ÷ ${s.years * 12}, flat rate. “${s.years} years / 100%” uses the full body price with no down payment.`,
+    `D/P ${s.dpPercent}% = ${s.dpPercent}% × (body price + est. insurance); D/P 0% = no down payment. Loan = body price − D/P. Monthly = (loan × ${s.ratePercent}% × ${s.years} years + loan) ÷ ${s.years * 12}, flat rate. With 0% D/P the whole body price is financed (insurance is still payable separately).`,
     'All figures are estimates and subject to bank approval. Prices, rebates and promotions may change at any time without prior notice.',
     `Auto-updated from toyota.com.my on the 1st and 15th of every month. Sources: <a href="${esc(data.sources.priceList)}">price list</a> · <a href="${esc(data.sources.promo)}">monthly promo</a>.`,
   ];
