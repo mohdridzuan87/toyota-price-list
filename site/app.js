@@ -291,6 +291,15 @@ function initCard() {
 
 $('print-btn').addEventListener('click', () => window.print());
 
+$('wa-btn').addEventListener('click', () => {
+  const url = location.origin + location.pathname;
+  const lines = [`*Toyota Price List ${$('period').textContent.trim()}*`, 'Body price, rebate, D/P and 9-year monthly instalment for all models:', url, ''];
+  if (card.name) lines.push(card.name + (card.title ? ' – ' + card.title : ''));
+  if (card.phone) lines.push(card.phone);
+  if (card.company) lines.push(card.company);
+  window.open('https://wa.me/?text=' + encodeURIComponent(lines.join(String.fromCharCode(10))), '_blank', 'noopener');
+});
+
 (async function start() {
   try {
     const r = await fetch('data/card.json', { cache: 'no-cache' });
