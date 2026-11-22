@@ -264,3 +264,6 @@ sup { color: var(--red-ink); font-weight: 800; }
 @media print { .card-logos img { height: 26px; max-width: 70px; } .card-logos { gap: 8px; } }
 .fields label.btn { display: inline-block; color: #fff; font-size: 14px; font-weight: 700; }
 .fields label.btn.ghost { color: var(--ink); }
+
+.namecard.unedited .setup-hint { display: block; }
+.namecard.unedited #edit-btn { background: var(--red); }

@@ -22,11 +22,11 @@ Rate, D/P % and tenure live in `config/products.json` → `settings`.
 
 ## For any Toyota sales advisor
 
-The page is generic: nobody's name is built in. The first time a sales advisor opens it, the name card is empty (greyed examples are shown). They tap **Edit card** and fill in name, job title, phone (auto-formatted as +6016 - 331 3607), company and a profile photo (shown in a circle, with zoom and reposition). The card is stored **on that person's own phone** (localStorage + IndexedDB, asked to be persistent) and never sent anywhere. **Save backup file / Restore backup** keep a copy on the phone.
+The card starts with sample details from `site/data/card.json` (Wan Jasni, +6016 - 331 3607, TOYOTA PCM | Telok Panglima Garang). Each sales advisor taps **Edit card** and replaces them with their own name, job title, phone (auto-formatted as +6016 - 331 3607), company, address, a profile photo (shown in a circle, with zoom and reposition) and up to three extra images. The card is saved in that person's own **browser data (localStorage)** on their phone and never sent anywhere.
 
 **Share PDF to WhatsApp** and **Download PDF** build a one-page A4 landscape vector PDF in the browser (`site/pdf.js`, jsPDF in `site/vendor/`), with that advisor's own name card on it. On phones the share sheet sends the PDF file; on desktop the PDF is downloaded and WhatsApp Web opens so it can be attached. **Print** uses a matching one-page print layout.
 
-Shared defaults for the card are in `site/data/card.json` (blank by default).
+Change the sample details everyone starts with in `site/data/card.json`.
 
 ## If a model fails to update
 
@@ -45,4 +45,4 @@ npm test            # compare against the November 2026 Excel (only valid for th
 
 Prices are estimates for reference. Always confirm with the official Toyota price list.
 
-Extra images: besides the circular profile photo, the card has three more image slots (company logo plus two others). They show beside the details on the page and are drawn on the PDF (up to 11 mm tall). They are stored on the phone with the rest of the card and included in the backup file.
+Extra images: besides the circular profile photo, the card has three more image slots (company logo plus two others). They show beside the details on the page and are drawn on the PDF (up to 11 mm tall). They are saved in the browser with the rest of the card.
