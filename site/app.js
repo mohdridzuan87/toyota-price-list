@@ -62,7 +62,7 @@ function renderModels(data) {
     ]),
   ];
   const thead = `<thead><tr><th scope="col">Model &amp; variant</th>${cols.map((c) => `<th scope="col" class="${[c.em ? 'em' : '', c.cls || '', c.g !== undefined ? 'g' + c.g : ''].join(' ')}">${esc(c.h)}${c.sub ? `<small>${esc(c.sub)}</small>` : ''}</th>`).join('')}</tr></thead>`;
-  const label = (i) => (cols[i].g === undefined ? cols[i].h : `${cols[i].h} (${dps[cols[i].g]}% D/P)`);
+  const label = (i) => (cols[i].g === undefined || cols[i].h.startsWith('D/P') ? cols[i].h : `${cols[i].h} (${dps[cols[i].g]}% D/P)`);
 
   const html = data.groups.map((g) => {
     const notes = [];
