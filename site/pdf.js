@@ -286,7 +286,7 @@ async function drawSheet(doc, { data, card, period, updated }) {
       const px = right ? x0 + cx[i + 1] - 1.1 : x0 + 1.4;
       lines.forEach((ln, li) => {
         const yy = hy + headH / 2 + (li - (lines.length - 1) / 2) * 2.3 * k;
-        T(ln, px, yy, { size: 5.3 * k, bold: true, color: em ? RED : MUTED, align: right ? 'right' : 'left' });
+        T(ln, px, yy, { size: 5.3 * k, bold: true, color: em ? RED : [0, 0, 0], align: right ? 'right' : 'left' });
       });
     });
 
@@ -300,7 +300,7 @@ async function drawSheet(doc, { data, card, period, updated }) {
       doc.line(x0, ry + r.h, x0 + colW, ry + r.h);
       const mid = ry + r.h / 2;
       const nameLines = wrap(v.name, cw[0] - 1.6, fs, true);
-      nameLines.forEach((ln, li) => T(ln, x0 + 1.4, mid + (li - (nameLines.length - 1) / 2) * 2.5 * k, { size: fs, bold: true }));
+      nameLines.forEach((ln, li) => T(ln, x0 + 1.4, mid + (li - (nameLines.length - 1) / 2) * 2.5 * k, { size: fs, bold: true, color: [0, 0, 0] }));
       const nfs = fs * 1.3; // numbers: bold and 30% larger
       const num = (i, text, o = {}) => T(text, x0 + cx[i + 1] - 1.1, mid, { size: nfs, bold: true, align: 'right', ...o });
       num(1, rm(v.body));
